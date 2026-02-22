@@ -1,0 +1,12 @@
+docs/
+.DS_Store
+._*
+.vscode/
+.idea/
+*.log
+node_modules/
+dist/
+build/
+*.zip
+*.tar.gz
+*.tgz
