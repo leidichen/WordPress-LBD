@@ -1,0 +1,231 @@
+/* 固定Bear博客风格默认配色 */
+:root {
+    --width: 660px;
+    --font-yahei: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Helvetica,Arial,"PingFangSC-Regular","Hiragino Sans GB","Lantinghei SC","Microsoft Yahei","Source Han Sans CN","WenQuanYi Micro Hei",SimSun,sans-serif;
+    --font-fangsong: Baskerville, "Times New Roman", "Liberation Serif", STFangsong, FangSong, FangSong_GB2312, "CWTEX\-F", serif;
+    --font-songti: Georgia, "Nimbus Roman No9 L", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "Source Han Serif CN", STSong, "AR PL New Sung", "AR PL SungtiL GB", NSimSun, SimSun, "TW\-Sung", "WenQuanYi Bitmap Song", "AR PL UMing CN", "AR PL UMing HK", "AR PL UMing TW", "AR PL UMing TW MBE", PMingLiU, MingLiU, serif;
+    --font-scale: 1em;
+    
+    /* 用户满意的手调Bear博客风格配色 */
+    --background-color: #022430;        /* 深蓝绿色背景 */
+    --heading-color: #eee;              /* 标题文字浅白色 */
+    --text-color: #e0f0f8;             /* 主要文字浅蓝白色 */
+    --link-color: #8cc2dd;             /* Bear博客链接蓝色 */
+    --visited-color: #8b6fcb;          /* 已访问链接紫色 */
+    --code-background-color: #000;     /* 代码背景黑色 */
+    --code-color: #ddd;                /* 代码文字浅灰色 */
+    --blockquote-color: #ccc;          /* 引用文字灰色 */
+    --blockquote-border-color: #444;   /* 引用边框深灰色 */
+    --gray-color: #888;                /* 灰色文字 */
+    
+    /* 闪念卡片主题变量 - 用户满意的手调配色 */
+    --card-background-dark: #00222f;    /* 稍深的蓝绿色卡片背景 */
+    --card-border-dark: #003b50;        /* 蓝绿色边框 */
+    --card-text-dark: #e0f0f8;          /* 浅蓝白色文字 */
+    --card-time-dark: #a0d0e0;          /* 浅蓝色时间文字 */
+    --card-background-light: #ffffff;
+    --card-border-light: #e0e0e0;
+    --card-text-light: #2c3e50;
+    --card-time-light: #6c7b8a;
+}
+/* 默认以暗色为主题，提供 `body.light-theme` 类用于切换至亮色 */
+body.light-theme {
+    --background-color: #fff;
+    --heading-color: #222;
+    --text-color: #444;
+    --link-color: #8cc2dd;
+    --visited-color:  #8b6fcb;
+    --code-background-color: #f2f2f2;
+    --code-color: #222;
+    --blockquote-color: #222;
+    --blockquote-border-color: #999;
+    --gray-color: #aaa;
+    
+    /* 亮色主题下的卡片变量 */
+    --card-background: var(--card-background-light);
+    --card-border: var(--card-border-light);
+    --card-text: var(--card-text-light);
+    --card-time: var(--card-time-light);
+}
+
+/* 确保主题切换时 body 样式正确应用 */
+body.light-theme {
+    background-color: var(--background-color) !important;
+    color: var(--text-color) !important;
+}
+
+/* 暗色主题下的卡片变量 */
+:root {
+    --card-background: var(--card-background-dark);
+    --card-border: var(--card-border-dark);
+    --card-text: var(--card-text-dark);
+    --card-time: var(--card-time-dark);
+}
+
+body {
+    font-family: var(--font-yahei); /* 可替换 --font-fangsong 或 --font-songti 字体 */
+    font-size: var(--font-scale);
+    margin: auto;
+    padding: 20px;
+    max-width: var(--width);
+    text-align: left;
+    background-color: var(--background-color);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.7;
+    color: var(--text-color);
+}
+html{scroll-behavior:smooth;}
+h1,h2,h3,h4,h5,h6{color:var(--heading-color);display:inherit}
+
+/* 隐藏归档和分类页面的标题 */
+.archive h1.title,
+.category h1.title,
+.taxonomy h1.title,
+.page h1.title,
+.category-weekly h1.title,
+.weekly-archive h1.title {
+    display: none;
+}
+
+/* 额外隐藏周刊网格页面的标题 */
+.category-weekly .title,
+.weekly-archive .title {
+    display: none !important;
+}
+
+/* 隐藏闪念页面的文章统计信息 */
+.archive .intro,
+.category .intro {
+    display: none;
+}
+a{color:var(--link-color);cursor:pointer;text-decoration:none;border-bottom:1px solid transparent}
+a:hover,a[aria-current*="page"]{border-bottom:1px solid}
+nav a{margin-right:8px}
+strong,b{color:var(--heading-color)}
+button{margin:0;cursor:pointer}
+table{width:100%}
+hr{border:0;border-top:1px dashed}
+img{max-width:100%;height:auto}
+
+/* Search Page Tags */
+.search-tags {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.search-tag-item {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: var(--blockquote-border-color); /* 使用稍微深一点的背景 */
+    border-radius: 20px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 0.85em;
+    transition: all 0.2s ease;
+    opacity: 0.8;
+}
+
+.search-tag-item:hover {
+    background-color: var(--link-color);
+    color: #fff;
+    opacity: 1;
+    text-decoration: none;
+    border-bottom: none; /* 覆盖全局链接样式 */
+}
+
+/* 适配明暗模式的背景微调 */
+body:not(.light-theme) .search-tag-item {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.light-theme .search-tag-item {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+time,.intro{color:var(--gray-color);}
+code{font-family:monospace;padding:2px;background-color:var(--code-background-color);color:var(--code-color);border-radius:4px}
+blockquote{border-left:1px solid var(--blockquote-border-color,#999);color:var(--blockquote-color,var(--code-color));padding-left:20px;font-style:italic}
+input{border-radius:4px;border:1px solid var(--gray-color);margin:0 0 15px 0;padding:10px;width:50%;font-size:0.9em;background:var(--background-color);color:var(--heading-color)}
+input[type="submit"]{border:none;padding:9px 16px 10px;text-align:center;width:80px;display:inline-flex;background-color:var(--heading-color);color:var(--code-background-color);}
+input[type="submit"]:hover{cursor:pointer;opacity:.7}
+textarea{border-radius:4px;border:1px solid var(--gray-color);display:block;margin:0 0 10px;padding:10px;width:calc(100% - 25px);background:var(--background-color);color:var(--code-color);}
+input:focus,textarea:focus{border:1px solid var(--heading-color);outline:0;box-shadow:0 0 5px rgba(0,0,0,0.1);}
+header,footer{padding:20px 0}
+.title:hover{text-decoration:none;border:none}
+.title h1,.title h2{font-size:1.5em}
+ul.posts{list-style-type:disc;padding-left:20px}
+ul.posts li{margin:3px 0}
+ul.posts li span{flex:0 0 115px}
+ul.posts li a:visited{color:var(--link-color)}
+.tags{margin-top:30px;color:var(--gray-color)}
+.tags a{margin:0 5px 0 2px}
+
+/* 通用分页导航样式 - 极简风格 */
+.pagination {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 1rem;
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.pagination .page-numbers {
+    display: inline-block;
+    padding: 5px 10px;
+    color: var(--gray-color);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.pagination .page-numbers:hover {
+    color: var(--link-color);
+    border-bottom: 1px solid var(--link-color);
+}
+
+.pagination .page-numbers.current {
+    color: var(--link-color);
+    font-weight: bold;
+    border-bottom: 1px solid var(--link-color);
+    cursor: default;
+}
+
+.pagination .page-numbers.dots {
+    border: none;
+    padding: 5px;
+}
+
+/* 代码块样式优化 - 防止溢出 */
+pre {
+    background: var(--code-background-color);
+    color: var(--code-color);
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto; /* 允许横向滚动 */
+    max-width: 100%;
+    margin-bottom: 20px;
+    border: 1px solid var(--blockquote-border-color);
+    font-family: monospace;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* 重置 pre 内部 code 的样式 */
+pre code {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    color: inherit;
+    white-space: pre; /* 保持原有格式 */
+}
+
+/* 文章内容排版优化 */
+.content {
+    font-size: 15px;
+    line-height: 1.75;
+    letter-spacing: 1px;
+}

@@ -1,0 +1,107 @@
+/* 博客页面样式 */
+.blog-page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.blog-group {
+    margin-bottom: 24px;
+}
+
+.blog-group-title {
+    margin: 0 0 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+    border-bottom: 1px dashed var(--blockquote-border-color);
+    padding-bottom: 6px;
+}
+
+.blog-posts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.blog-item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.blog-item::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--gray-color);
+    margin-right: 12px; /* 增加与标题的间距 */
+    flex-shrink: 0;
+    align-self: center; /* 垂直居中 */
+    opacity: 0.8; /* 稍微淡一点 */
+}
+
+body.light-theme .blog-item {
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.blog-link {
+    border-bottom: none;
+    line-height: 1.5;
+    font-size: 15px;
+}
+
+.blog-link:hover {
+    border-bottom: 1px solid;
+}
+
+.blog-time {
+    white-space: nowrap;
+    font-family: monospace;
+    color: var(--gray-color);
+    font-size: 0.9em;
+    margin-left: auto;
+}
+
+.blog-empty {
+    text-align: center;
+    color: var(--gray-color);
+    padding: 40px 0;
+}
+
+@media (max-width: 640px) {
+    .blog-page {
+        padding: 14px;
+    }
+
+    /* 移动端保持单行布局，不换行 */
+    .blog-item {
+        flex-wrap: nowrap;
+        gap: 8px; /* 减小间距 */
+        align-items: baseline; /* 基线对齐，适应长标题换行 */
+    }
+    
+    .blog-item::before {
+        margin-right: 4px;
+        align-self: flex-start;
+        margin-top: 8px; /* 微调圆点对齐 */
+    }
+
+    .blog-link {
+        flex: 1; 
+        min-width: 0;
+        /* 允许标题换行，不强制截断 */
+    }
+
+    .blog-time {
+        width: auto; /* 取消之前的100%宽度 */
+        margin-left: auto; /* 靠右对齐 */
+        margin-top: 0;
+        font-size: 0.85em;
+        flex-shrink: 0; /* 防止日期被压缩 */
+    }
+}

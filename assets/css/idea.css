@@ -1,0 +1,427 @@
+/* 闪念页面样式 */
+:root {
+    --idea-card-bg-dark: #00222f;
+    --idea-card-border-dark: #003b50;
+    --idea-card-text-dark: #e0f0f8;
+    --idea-card-time-dark: #a0d0e0;
+    --idea-card-bg-light: #ffffff;
+    --idea-card-border-light: #e0e0e0;
+    --idea-card-text-light: #2c3e50;
+    --idea-card-time-light: #6c7b8a;
+    --idea-link-color: #8cc2dd;
+    --idea-heading-color: #eee;
+}
+
+body.light-theme {
+    --idea-card-bg: var(--idea-card-bg-light);
+    --idea-card-border: var(--idea-card-border-light);
+    --idea-card-text: var(--idea-card-text-light);
+    --idea-card-time: var(--idea-card-time-light);
+}
+
+body {
+    --idea-card-bg: var(--idea-card-bg-dark);
+    --idea-card-border: var(--idea-card-border-dark);
+    --idea-card-text: var(--idea-card-text-dark);
+    --idea-card-time: var(--idea-card-time-dark);
+}
+
+.idea-container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.idea-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.idea-card {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.idea-card-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.idea-card-container {
+    background: var(--idea-card-bg);
+    border: 1px solid var(--idea-card-border);
+    padding: 16px;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: var(--idea-card-radius, 12px);
+    user-select: text;
+    position: relative;
+    transform-origin: center;
+    display: flex;
+    flex-direction: column;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.idea-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 0;
+    flex-shrink: 0;
+}
+
+.idea-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.idea-timestamp {
+    color: var(--idea-card-time);
+    font-weight: 500;
+    font-size: 0.8em;
+    font-family: monospace;
+}
+
+.idea-time-display {
+    color: var(--idea-card-time);
+    font-size: 0.85em;
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+.idea-word-count {
+    color: var(--idea-card-time);
+    font-size: 0.8em;
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+.idea-card-content {
+    margin-bottom: 10px;
+    line-height: 1.6;
+    color: var(--idea-card-text);
+    font-size: 0.92em !important;
+    text-align: justify !important;
+    text-justify: inter-ideograph;
+    width: 100% !important;
+    box-sizing: border-box;
+    word-break: break-word;
+    flex: 1;
+    position: relative;
+}
+
+.idea-card-container .idea-card-content p {
+    margin-bottom: 1.6em !important;
+    margin-top: 0 !important;
+    line-height: 1.8 !important;
+    text-align: justify !important;
+    text-justify: inter-ideograph;
+}
+
+.idea-card-container .idea-card-content br {
+    display: block;
+    content: "";
+    margin-bottom: 0.8em !important;
+    line-height: 1.8;
+}
+
+.idea-card-container .idea-card-content p:last-child,
+.idea-card-content p:last-child {
+    margin-bottom: 0 !important;
+}
+
+.idea-card-content br + br {
+    margin-top: 16px;
+    display: block;
+}
+
+/* 启用文本折叠（无论是否有图） */
+.idea-content-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.idea-card-container.expanded .idea-content-clamp {
+    -webkit-line-clamp: unset;
+    display: block;
+    overflow: visible;
+}
+
+.idea-expand-toggle {
+    display: none;
+    margin-top: 8px;
+    cursor: pointer;
+}
+
+.idea-expand-text {
+    color: #1da1f2;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.idea-expand-text:hover {
+    color: #0d8bd9;
+    text-decoration: underline;
+}
+
+/* 内容中图片网格（由 PHP 输出 .image-gallery/.image-item） */
+.idea-card-content .image-gallery {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px; /* 增加图片与文字间距 */
+}
+
+/* 单张图片与正文间距 */
+.idea-content-clamp > img,
+.idea-card-content > img {
+    display: block;
+    margin-bottom: 24px; /* 增加图片与文字间距 */
+}
+
+.idea-card-content .image-gallery.two-images {
+    display: flex;
+    gap: 10px;
+}
+
+.idea-card-content .image-item {
+    flex: 1;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.idea-card-content .image-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.idea-card-content .image-item img:hover {
+    transform: scale(1.02);
+}
+
+.idea-lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.idea-lightbox-overlay.active {
+    opacity: 1;
+}
+
+.idea-lightbox-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.idea-lightbox-image-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.idea-lightbox-image {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.idea-lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    z-index: 10001;
+}
+
+.idea-lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.idea-lightbox-counter {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 4px;
+    z-index: 10001;
+}
+
+.idea-lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    z-index: 10001;
+}
+
+.idea-lightbox-nav:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.idea-lightbox-nav.prev {
+    left: 20px;
+}
+
+.idea-lightbox-nav.next {
+    right: 20px;
+}
+
+.idea-lightbox-indicator {
+    position: absolute;
+    bottom: 20px;
+    display: flex;
+    gap: 8px;
+    z-index: 10001;
+}
+
+.idea-lightbox-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.idea-lightbox-dot.active {
+    background: white;
+}
+
+.idea-lightbox-dot:hover {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.idea-empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--idea-card-time);
+}
+
+.idea-empty p {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+@media (max-width: 768px) {
+    .idea-container {
+        padding: 15px;
+    }
+
+    .idea-card-container {
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    .idea-card-header {
+        margin-bottom: 12px;
+    }
+
+    .idea-card-content {
+        font-size: 0.9em !important;
+        line-height: 1.7;
+        width: 100% !important;
+    }
+
+    .idea-card-content p {
+        margin: 0 0 16px 0;
+    }
+
+    .idea-card-content br {
+        line-height: 1.1;
+    }
+
+    .idea-card-content br::after {
+        height: 16px;
+        margin-top: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .idea-container {
+        padding: 12px;
+    }
+
+    .idea-card-container {
+        padding: 12px;
+        margin: 12px 0;
+    }
+
+    .idea-card-content {
+        font-size: 0.85em !important;
+        line-height: 1.6;
+        width: 100% !important;
+    }
+
+    .idea-card-content p {
+        margin: 0 0 14px 0;
+    }
+
+    .idea-card-content br {
+        line-height: 1;
+    }
+
+    .idea-card-content br::after {
+        height: 14px;
+        margin-top: 4px;
+    }
+
+    .idea-card-content .image-gallery.two-images {
+        flex-direction: column;
+    }
+}
