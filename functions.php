@@ -1,6 +1,6 @@
 <?php
 // 主题设置
-define('LBD_VERSION', '1.2.2');
+define('LBD_VERSION', '1.2.3');
 
 /**
  * 自动更新设置 (基于 GitHub)

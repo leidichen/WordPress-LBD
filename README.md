@@ -2,7 +2,11 @@
 
 > 一款基于 YayU Theme 深度改造的极简 WordPress 主题，灵感源自 Bear Blog。专注于卡片式闪念记录与纯粹的阅读体验。
 
-![License](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-green) ![Version](https://img.shields.io/badge/version-1.2.1-blue)
+![License](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-green) ![Version](https://img.shields.io/badge/version-1.2.3-blue)
+
+## 🧾 更新说明
+
+- 1.2.3：订阅页面 RSS 文案优化
 
 ## ✨ 核心特性
 
