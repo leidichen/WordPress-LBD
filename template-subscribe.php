@@ -13,7 +13,7 @@ get_header(); ?>
         <div class="rss-list">
             <div class="rss-item">
                 <h3><a href="<?php echo esc_url(home_url('/feed/')); ?>">博客 RSS</a></h3>
-                <p>仅包含深度思考与技术文章，剔除周刊与闪念。</p>
+                <p>原创长文与技术文章，不定期更新。</p>
                 <div class="rss-link-box">
                     <code><?php echo esc_url(home_url('/feed/')); ?></code>
                 </div>
@@ -21,7 +21,7 @@ get_header(); ?>
             
             <div class="rss-item">
                 <h3><a href="<?php echo esc_url(home_url('/category/weekly/feed/')); ?>">周刊 RSS</a></h3>
-                <p>每周精选分享，独立更新。</p>
+                <p>每周精选分享，每周更新。</p>
                 <div class="rss-link-box">
                     <code><?php echo esc_url(home_url('/category/weekly/feed/')); ?></code>
                 </div>
@@ -41,7 +41,7 @@ get_header(); ?>
                 }
                 ?>
                 <h3><a href="<?php echo esc_url(home_url('/category/' . $flash_slug . '/feed/')); ?>">闪念 RSS</a></h3>
-                <p>类似朋友圈的碎碎念，生活灵感。</p>
+                <p>生活灵感分享，随时更新。</p>
                 <div class="rss-link-box">
                     <code><?php echo esc_url(home_url('/category/' . $flash_slug . '/feed/')); ?></code>
                 </div>
