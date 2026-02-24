@@ -52,13 +52,20 @@ get_header(); ?>
                 <?php endwhile; ?>
             </div>
 
-            <?php
-            the_posts_pagination(array(
-                'mid_size'  => 2,
-                'prev_text' => '上一页',
-                'next_text' => '下一页',
-            ));
-            ?>
+            <?php if ($weekly_query->max_num_pages > 1) : ?>
+                <div class="pagination">
+                    <?php
+                    echo paginate_links(array(
+                        'total' => $weekly_query->max_num_pages,
+                        'current' => max(1, get_query_var('paged')),
+                        'prev_text' => '&laquo;',
+                        'next_text' => '&raquo;',
+                        'mid_size' => 2,
+                        'end_size' => 1
+                    ));
+                    ?>
+                </div>
+            <?php endif; ?>
 
         <?php else : ?>
             <p>暂无周刊文章。</p>

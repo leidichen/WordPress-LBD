@@ -161,6 +161,7 @@ body {
 .idea-expand-toggle {
     display: none;
     margin-top: 8px;
+    margin-bottom: 16px;
     cursor: pointer;
 }
 
@@ -182,33 +183,58 @@ body {
 .idea-card-content .image-gallery {
     display: flex;
     gap: 10px;
-    margin-bottom: 24px; /* 增加图片与文字间距 */
+    margin-bottom: 12px;
 }
 
 /* 单张图片与正文间距 */
 .idea-content-clamp > img,
 .idea-card-content > img {
     display: block;
-    margin-bottom: 24px; /* 增加图片与文字间距 */
+    margin-bottom: 12px;
+}
+
+.idea-card-content .image-gallery.two-images,
+.idea-card-content .image-gallery.grid-images {
+    display: grid;
+    gap: 10px;
 }
 
 .idea-card-content .image-gallery.two-images {
-    display: flex;
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.idea-card-content .image-gallery.grid-images {
+    grid-template-columns: repeat(3, 1fr);
 }
 
 .idea-card-content .image-item {
     flex: 1;
     overflow: hidden;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .idea-card-content .image-item img {
-    width: 100%;
-    height: auto;
+    width: 100% !important;
+    height: 100% !important;
     display: block;
     cursor: pointer;
     transition: transform 0.3s ease;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.idea-card-content .image-gallery.two-images .image-item,
+.idea-card-content .image-gallery.grid-images .image-item {
+    aspect-ratio: 1 / 1;
+}
+
+.idea-card-content .image-gallery.single-image .image-item {
+    aspect-ratio: auto;
+}
+
+.idea-card-content .image-gallery.single-image .image-item img {
+    height: auto !important;
+    object-fit: contain !important;
 }
 
 .idea-card-content .image-item img:hover {

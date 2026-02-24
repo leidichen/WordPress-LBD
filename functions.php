@@ -1,6 +1,6 @@
 <?php
 // 主题设置
-define('LBD_VERSION', '1.2.3');
+define('LBD_VERSION', '1.2.4');
 
 /**
  * 自动更新设置 (基于 GitHub)
@@ -671,24 +671,34 @@ function generate_image_gallery_display($image_data) {
     $image_count = count($image_data);
     
     if ($image_count == 1) {
-        // 单张图片
+        $single_html = '<div class="image-gallery single-image">';
+        $single_html .= '<div class="image-item">' . $image_data[0]['tag'] . '</div>';
+        $single_html .= '</div>';
         return array(
-            'preview' => $image_data[0]['tag'],
-            'full' => $image_data[0]['tag'],
+            'preview' => $single_html,
+            'full' => $single_html,
             'gallery_data' => json_encode(array($image_data[0]))
         );
     } else {
-        // 两张或更多图片 - 始终显示前两张并排
-        $preview_html = '<div class="image-gallery two-images">';
-        $preview_html .= '<div class="image-item">' . $image_data[0]['tag'] . '</div>';
-        $preview_html .= '<div class="image-item">' . $image_data[1]['tag'] . '</div>';
-        $preview_html .= '</div>';
-        
-        // 展开后也保持并排显示前两张
-        $full_html = '<div class="image-gallery two-images">';
-        $full_html .= '<div class="image-item">' . $image_data[0]['tag'] . '</div>';
-        $full_html .= '<div class="image-item">' . $image_data[1]['tag'] . '</div>';
-        $full_html .= '</div>';
+        if ($image_count == 2) {
+            $preview_html = '<div class="image-gallery two-images">';
+            $preview_html .= '<div class="image-item">' . $image_data[0]['tag'] . '</div>';
+            $preview_html .= '<div class="image-item">' . $image_data[1]['tag'] . '</div>';
+            $preview_html .= '</div>';
+            
+            $full_html = '<div class="image-gallery two-images">';
+            $full_html .= '<div class="image-item">' . $image_data[0]['tag'] . '</div>';
+            $full_html .= '<div class="image-item">' . $image_data[1]['tag'] . '</div>';
+            $full_html .= '</div>';
+        } else {
+            $preview_html = '<div class="image-gallery grid-images">';
+            foreach ($image_data as $img) {
+                $preview_html .= '<div class="image-item">' . $img['tag'] . '</div>';
+            }
+            $preview_html .= '</div>';
+            
+            $full_html = $preview_html;
+        }
         
         return array(
             'preview' => $preview_html,

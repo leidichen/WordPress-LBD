@@ -2,11 +2,7 @@
 
 > 一款基于 YayU Theme 深度改造的极简 WordPress 主题，灵感源自 Bear Blog。专注于卡片式闪念记录与纯粹的阅读体验。
 
-![License](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-green) ![Version](https://img.shields.io/badge/version-1.2.3-blue)
-
-## 🧾 更新说明
-
-- 1.2.3：订阅页面 RSS 文案优化
+![License](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-green) ![Version](https://img.shields.io/badge/version-1.2.4-blue)
 
 ## ✨ 核心特性
 
@@ -39,7 +35,7 @@ LBD 主题通过**页面模板**来实现不同的布局功能。请按以下步
 - 新建一个页面，标题任意（如“闪念”）。
 - 在 **页面属性** -> **模板** 中选择 **卡片模板**。
 - 发布页面。
-- *效果：显示类似 Twitter/朋友圈的卡片流，每页 20 篇，支持图片画廊。*
+- *效果：显示类似 Twitter/朋友圈的卡片流，每页 15 篇，支持图片画廊。*
 
 #### 📰 周刊/网格 (Weekly)
 - 新建一个页面，标题任意（如“周刊”）。

@@ -95,7 +95,7 @@ get_header(); ?>
     line-height: 1.5;
 }
 .rss-link-box {
-    background: rgba(0, 0, 0, 0.2);
+    background: transparent;
     padding: 8px 12px;
     border-radius: 4px;
     font-family: monospace;
@@ -103,6 +103,11 @@ get_header(); ?>
     word-break: break-all;
     color: var(--code-color);
     border: 1px solid rgba(255,255,255,0.05);
+}
+.rss-link-box code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
 }
 </style>
 
