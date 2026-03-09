@@ -22,11 +22,54 @@ if (!function_exists('dear_setup')) :
 	{
       add_theme_support('automatic-feed-links');
       add_theme_support('title-tag');
-	  add_theme_support('custom-background');
+	  add_theme_support('custom-background', array(
+        'default-color' => '022430',
+        'wp-head-callback' => 'dear_custom_background_cb', // 使用自定义回调，防止 WP 输出不必要的 CSS
+      ));
       register_nav_menu('primary-menu', 'Primary Menu');
       register_nav_menu('footer-menu', 'Footer Menu');
     }
     add_action('after_setup_theme', 'dear_setup');
+endif;
+
+// 自定义背景回调：仅输出 CSS 变量，不输出 body.custom-background 样式
+if ( ! function_exists( 'dear_custom_background_cb' ) ) :
+    function dear_custom_background_cb() {
+        $background_color = get_background_color();
+        // 只有当颜色存在且不为空时才输出变量
+        if ( $background_color ) {
+            echo "<style>:root { --background-color: #" . esc_attr($background_color) . "; }</style>\n";
+        }
+    }
+endif;
+
+if ( ! function_exists( 'dear_get_theme_preference' ) ) :
+	function dear_get_theme_preference() {
+		if ( isset( $_COOKIE['dear-theme'] ) ) {
+			$theme = sanitize_key( wp_unslash( $_COOKIE['dear-theme'] ) );
+			if ( in_array( $theme, array( 'light', 'dark' ), true ) ) {
+				return $theme;
+			}
+		}
+		// 移除强制 'dark'，允许默认回退或由 CSS 决定
+		// return 'dark';
+        return 'dark'; // 暂时保持 dark 作为默认，但确保 CSS 能覆盖
+	}
+endif;
+
+if ( ! function_exists( 'dear_filter_language_attributes' ) ) :
+	function dear_filter_language_attributes( $output ) {
+		if ( dear_get_theme_preference() !== 'light' ) {
+			return $output;
+		}
+
+		if ( strpos( $output, 'class=' ) !== false ) {
+			return preg_replace( '/class=("|\')(.*?)\\1/', 'class=$1$2 light-theme$1', $output, 1 );
+		}
+
+		return trim( $output ) . ' class="light-theme"';
+	}
+	add_filter( 'language_attributes', 'dear_filter_language_attributes' );
 endif;
 
 // 主题样式
@@ -61,13 +104,13 @@ if ( ! function_exists( 'yayu_load_style' ) ) :
 				'dear-idea-style',
 				get_template_directory_uri() . '/assets/css/idea.css',
 				array('dear-base-style'),
-				LBD_VERSION
+				'1.0.1' // 更新版本号以清除缓存
 			);
 		}
-		// 注册并内联一个小脚本用于主题亮/暗切换（基于 body.light-theme）
+		// 注册并内联一个小脚本用于主题亮/暗切换
 		wp_register_script('dear-theme-toggle', false, array(), null, true);
 		wp_enqueue_script('dear-theme-toggle');
-		$script = "(function(){var t=document.getElementById('theme-toggle');if(!t)return;var b=document.documentElement,s=localStorage.getItem('dear-theme')||'dark';if(s==='light')b.classList.add('light-theme');var sunIcon=t.querySelector('.sun'),moonIcon=t.querySelector('.moon');var m=document.getElementById('theme-color-meta');function sync(){var isLight=b.classList.contains('light-theme');t.setAttribute('aria-pressed',isLight?'true':'false');if(sunIcon&&moonIcon){sunIcon.style.display=isLight?'none':'inline';moonIcon.style.display=isLight?'inline':'none';}if(m)m.setAttribute('content',isLight?'#ffffff':'#022430');}t.addEventListener('click',function(){var isLight=b.classList.contains('light-theme');if(isLight){b.classList.remove('light-theme');localStorage.setItem('dear-theme','dark');}else{b.classList.add('light-theme');localStorage.setItem('dear-theme','light');}sync();});sync();})();";
+		$script = "(function(){var t=document.getElementById('theme-toggle');if(!t)return;var b=document.documentElement;var sunIcon=t.querySelector('.sun'),moonIcon=t.querySelector('.moon');var m=document.getElementById('theme-color-meta');function persist(theme){try{localStorage.setItem('dear-theme',theme);document.cookie='dear-theme='+theme+'; path=/; max-age=31536000; SameSite=Lax';}catch(e){}}function sync(){var isLight=b.classList.contains('light-theme');t.setAttribute('aria-pressed',isLight?'true':'false');if(sunIcon&&moonIcon){sunIcon.style.display=isLight?'none':'inline';moonIcon.style.display=isLight?'inline':'none';}if(m)m.setAttribute('content',isLight?'#ffffff':'#022430');}t.addEventListener('click',function(){var isLight=b.classList.contains('light-theme');if(isLight){b.classList.remove('light-theme');persist('dark');}else{b.classList.add('light-theme');persist('light');}sync();});sync();})();";
 		wp_add_inline_script('dear-theme-toggle', $script);
 
 		// 闪念页面交互脚本
@@ -84,8 +127,39 @@ if ( ! function_exists( 'yayu_load_style' ) ) :
 	add_action( 'wp_enqueue_scripts', 'yayu_load_style' );
 endif;
 
-	// 固定默认配色方案 - 使用用户手调的Bear博客风格
-	function dear_weekly_dynamic_styles() {
+// 输出用户自定义背景色为 CSS 变量，确保闪念页面能跟随变化
+// 移除旧的 dear_custom_background_css_variable，因为现在由 dear_custom_background_cb 统一接管
+/*
+if ( ! function_exists( 'dear_custom_background_css_variable' ) ) :
+	function dear_custom_background_css_variable() {
+		$background_color = get_background_color();
+		// 如果获取到背景色（且不是默认值，或者用户明确设置了），则覆盖变量
+		if ( $background_color && $background_color !== '022430' ) {
+			echo "<style>:root { --background-color: #" . esc_attr($background_color) . "; }</style>\n";
+		}
+	}
+	add_action( 'wp_head', 'dear_custom_background_css_variable', 100 ); // 晚一点执行，确保覆盖默认样式
+endif;
+*/
+
+if ( ! function_exists( 'dear_output_theme_init_script' ) ) :
+	function dear_output_theme_init_script() {
+        // 获取用户自定义背景色（如果用户未设置，WP 会返回默认值或空）
+        $custom_bg = get_background_color();
+        
+        // 确保默认颜色和用户设置的颜色都能正确传递给 JS
+        // 如果 $custom_bg 为空，使用 CSS 变量中的默认值（这里不硬编码，交给 CSS 处理）
+        // 但为了 JS 逻辑的完整性，我们可以传递一个标识
+        
+        $bg_color_js = $custom_bg ? '#' . $custom_bg : '';
+
+		echo "<script>(function(){try{var d=document.documentElement;var s=localStorage.getItem('dear-theme')||'dark';document.cookie='dear-theme='+s+'; path=/; max-age=31536000; SameSite=Lax';if(s==='light'){d.classList.add('light-theme');}else{d.classList.remove('light-theme');}var m=document.getElementById('theme-color-meta');if(m){m.setAttribute('content',s==='light'?'#ffffff':'#022430');}}catch(e){}})();</script>\n";
+	}
+	add_action( 'wp_head', 'dear_output_theme_init_script', 0 );
+endif;
+
+		// 固定默认配色方案 - 使用用户手调的Bear博客风格
+		function dear_weekly_dynamic_styles() {
 	    $columns = get_weekly_grid_columns();
 	    $card_spacing = get_weekly_card_spacing();
 	    
@@ -392,8 +466,31 @@ function dear_flash_customizer($wp_customize) {
         ),
         'description' => '设置卡片的圆角大小（像素）'
     ));
+
+    // 修改默认菜单名称
+    $section_colors = $wp_customize->get_section('colors');
+    if ($section_colors) {
+        $section_colors->title = '颜色设置';
+    }
+
+    $panel_nav_menus = $wp_customize->get_panel('nav_menus');
+    if ($panel_nav_menus) {
+        $panel_nav_menus->title = '菜单设置';
+    }
 }
-add_action('customize_register', 'dear_flash_customizer');
+add_action('customize_register', 'dear_flash_customizer', 20); // 提高优先级
+
+// 方案2：通过翻译过滤强制修改“菜单”字样（备用且强力）
+function dear_rename_customizer_menu_text($translated_text, $text, $domain) {
+    if (is_customize_preview() && $text === 'Menus' && ($domain === 'default' || empty($domain))) {
+        return '菜单设置';
+    }
+    if (is_customize_preview() && $text === '菜单' && ($domain === 'default' || empty($domain))) {
+        return '菜单设置';
+    }
+    return $translated_text;
+}
+add_filter('gettext', 'dear_rename_customizer_menu_text', 20, 3);
 
 // 获取闪念分类标识（slug）
 function get_flash_category_name() {

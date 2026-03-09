@@ -1,14 +1,28 @@
 <?php get_header();?>
 <?php if ( is_home() ) {
-$article_id = get_home_intro_page_id() ?: 2; // 获取设置的页面ID，若未设置则默认为2（兼容旧版）
-$intro_post = get_post($article_id);
+$article_id = get_home_intro_page_id();
+$intro_post = null;
+
+if ($article_id) {
+    $intro_post = get_post($article_id);
+} else {
+    // 如果未设置，自动寻找标题为“首页”的页面
+    $pages = get_pages(array(
+        'meta_key' => '_wp_page_template',
+        'hierarchical' => 0,
+        'post_status' => 'publish',
+        'number' => 1,
+        'title' => '首页' // 注意：WordPress get_pages 不直接支持 title 过滤，需后续判断
+    ));
+    
+    // 如果 get_pages 没搜到，尝试用更直接的方式
+    $intro_post = get_page_by_title('首页');
+}
+
 if ($intro_post) {
     echo apply_filters('the_content', $intro_post->post_content);
-} elseif ($article_id == 2) {
-    // 仅在默认为2且找不到页面时提示，避免未设置时也报错
-    if (current_user_can('edit_theme_options')) {
-        echo '<p style="color:var(--gray-color);font-size:0.9em;">[提示：未找到首页介绍内容。请在后台“外观-自定义-首页设置”中选择一个页面]</p>';
-    }
+} elseif (current_user_can('edit_theme_options')) {
+    echo '<p style="color:var(--gray-color);font-size:0.9em;">[提示：未找到首页介绍内容。请创建一个标题为“首页”的页面，或在后台“外观-自定义-首页设置”中选择一个页面]</p>';
 }
 ?>
 <h3>近期文章</h3>

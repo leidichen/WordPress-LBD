@@ -143,9 +143,12 @@
     };
 
     document.body.appendChild(overlay);
-    setTimeout(function () {
-      overlay.classList.add('active');
-    }, 10);
+    
+    // 强制触发重绘
+    void overlay.offsetWidth;
+    
+    // 添加激活类
+    overlay.classList.add('active');
   }
 
   function initImageLightbox() {

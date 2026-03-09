@@ -4,7 +4,8 @@
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="profile" href="https://gmpg.org/xfn/11">
-<meta id="theme-color-meta" name="theme-color" content="#022430">
+<?php $dear_theme_color = ( function_exists( 'dear_get_theme_preference' ) && dear_get_theme_preference() === 'light' ) ? '#ffffff' : '#022430'; ?>
+<meta id="theme-color-meta" name="theme-color" content="<?php echo esc_attr( $dear_theme_color ); ?>">
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
