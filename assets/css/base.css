@@ -1,3 +1,11 @@
+/* 强制禁用全站所有元素的过渡效果，确保极简与速度优先 */
+*,
+*::before,
+*::after {
+    transition: none !important;
+    animation: none !important;
+}
+
 /* 固定Bear博客风格默认配色 */
 :root {
     --width: 660px;
@@ -8,7 +16,8 @@
 
     /* 用户满意的手调Bear博客风格配色 */
     --background-color: #022430;
-    /* 深蓝绿色背景 */
+    --card-background-dark: #022430;
+    /* 将卡片背景设为与主背景一致 */
     --heading-color: #eee;
     /* 标题文字浅白色 */
     --text-color: #e0f0f8;

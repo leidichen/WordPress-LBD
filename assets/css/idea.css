@@ -1,6 +1,7 @@
 /* 闪念页面样式 */
 :root {
-    --idea-card-bg-dark: #00222f;
+    --idea-card-bg-dark: #022430;
+    /* 统一为全局背景色，消除色差感 */
     --idea-card-border-dark: #003b50;
     --idea-card-text-dark: #e0f0f8;
     --idea-card-time-dark: #a0d0e0;
@@ -67,6 +68,8 @@ body.light-theme {
     display: flex;
     flex-direction: column;
     -webkit-tap-highlight-color: transparent;
+    transition: none !important;
+    /* 强制禁用所有过渡 */
 }
 
 .idea-card-header {
@@ -241,6 +244,7 @@ body.light-theme {
 
 .idea-card-content .image-item img:hover {
     transform: scale(1.02);
+    /* 移除 transition，确保变形是即时的 */
 }
 
 .idea-lightbox-overlay {
@@ -389,7 +393,8 @@ body.light-theme {
 
     .idea-card-container {
         padding: 15px;
-        margin: 15px 0;
+        margin: 0;
+        /* 移除外边距，防止露出底层背景 */
     }
 
     .idea-card-header {
@@ -423,7 +428,8 @@ body.light-theme {
 
     .idea-card-container {
         padding: 12px;
-        margin: 12px 0;
+        margin: 0;
+        /* 移除外边距 */
     }
 
     .idea-card-content {
