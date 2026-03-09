@@ -1,6 +1,6 @@
 <?php
 // 主题设置
-define('LBD_VERSION', '1.2.4');
+define('LBD_VERSION', '1.2.5');
 
 /**
  * 自动更新设置 (基于 GitHub)
@@ -67,7 +67,7 @@ if ( ! function_exists( 'yayu_load_style' ) ) :
 		// 注册并内联一个小脚本用于主题亮/暗切换（基于 body.light-theme）
 		wp_register_script('dear-theme-toggle', false, array(), null, true);
 		wp_enqueue_script('dear-theme-toggle');
-		$script = "(function(){var t=document.getElementById('theme-toggle');if(!t)return;var b=document.body,s=localStorage.getItem('dear-theme')||'dark';if(s==='light')b.classList.add('light-theme');var sunIcon=t.querySelector('.sun'),moonIcon=t.querySelector('.moon');function sync(){var isLight=b.classList.contains('light-theme');t.setAttribute('aria-pressed',isLight?'true':'false');if(sunIcon&&moonIcon){sunIcon.style.display=isLight?'none':'inline';moonIcon.style.display=isLight?'inline':'none';}}t.addEventListener('click',function(){var isLight=b.classList.contains('light-theme');if(isLight){b.classList.remove('light-theme');localStorage.setItem('dear-theme','dark');}else{b.classList.add('light-theme');localStorage.setItem('dear-theme','light');}sync();});sync();})();";
+		$script = "(function(){var t=document.getElementById('theme-toggle');if(!t)return;var b=document.documentElement,s=localStorage.getItem('dear-theme')||'dark';if(s==='light')b.classList.add('light-theme');var sunIcon=t.querySelector('.sun'),moonIcon=t.querySelector('.moon');var m=document.getElementById('theme-color-meta');function sync(){var isLight=b.classList.contains('light-theme');t.setAttribute('aria-pressed',isLight?'true':'false');if(sunIcon&&moonIcon){sunIcon.style.display=isLight?'none':'inline';moonIcon.style.display=isLight?'inline':'none';}if(m)m.setAttribute('content',isLight?'#ffffff':'#022430');}t.addEventListener('click',function(){var isLight=b.classList.contains('light-theme');if(isLight){b.classList.remove('light-theme');localStorage.setItem('dear-theme','dark');}else{b.classList.add('light-theme');localStorage.setItem('dear-theme','light');}sync();});sync();})();";
 		wp_add_inline_script('dear-theme-toggle', $script);
 
 		// 闪念页面交互脚本

@@ -1,7 +1,6 @@
 /* 闪念页面样式 */
 :root {
     --idea-card-bg-dark: #022430;
-    /* 统一为全局背景色，消除色差感 */
     --idea-card-border-dark: #003b50;
     --idea-card-text-dark: #e0f0f8;
     --idea-card-time-dark: #a0d0e0;
@@ -22,7 +21,7 @@
 }
 
 /* 亮色主题变量覆盖 */
-body.light-theme {
+html.light-theme {
     --idea-card-bg: var(--idea-card-bg-light);
     --idea-card-border: var(--idea-card-border-light);
     --idea-card-text: var(--idea-card-text-light);
@@ -54,7 +53,7 @@ body.light-theme {
 }
 
 .idea-card-container {
-    background: var(--idea-card-bg);
+    background: var(--idea-card-bg) !important;
     border: 1px solid var(--idea-card-border);
     padding: 16px;
     margin: 0;
