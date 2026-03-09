@@ -55,7 +55,6 @@ get_header(); ?>
                                 <div class="idea-card-header">
                                     <span class="idea-timestamp"><?php echo get_the_time('m-d H:i'); ?></span>
                                     <div class="idea-meta">
-                                        <span class="idea-time-display"><?php echo get_smart_time_display(); ?></span>
                                         <span class="idea-word-count"><?php echo get_flash_word_count(); ?></span>
                                     </div>
                                 </div>

@@ -68,14 +68,12 @@ get_header(); ?>
     margin-top: 40px;
 }
 .rss-item {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--card-background);
     padding: 25px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--card-border);
 }
 .rss-item:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     border-color: var(--link-color);
 }
@@ -95,14 +93,14 @@ get_header(); ?>
     line-height: 1.5;
 }
 .rss-link-box {
-    background: transparent;
+    background: rgba(128, 128, 128, 0.05);
     padding: 8px 12px;
     border-radius: 4px;
     font-family: monospace;
     font-size: 0.85em;
     word-break: break-all;
     color: var(--code-color);
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid var(--card-border);
 }
 .rss-link-box code {
     background: transparent;

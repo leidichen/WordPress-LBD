@@ -22,13 +22,12 @@
     border: 1px solid var(--card-border);
     border-radius: 8px;
     overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .weekly-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .weekly-card-link {
@@ -57,7 +56,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
 }
 
 .weekly-card:hover .weekly-card-image img {
@@ -107,16 +105,16 @@
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 15px;
     }
-    
+
     .weekly-grid.columns-3 {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 15px;
     }
-    
+
     .weekly-card-image {
         height: 160px;
     }
-    
+
     .weekly-title {
         font-size: 1.7em;
         margin-bottom: 25px;
@@ -140,17 +138,21 @@
         font-size: 1.5em;
         margin-bottom: 20px;
     }
-    
+
     .weekly-card-image {
-        height: 100px !important; /* 手机上减小图片高度 */
+        height: 100px !important;
+        /* 手机上减小图片高度 */
     }
-    
+
     .weekly-card-title {
-        font-size: 0.85em !important; /* 稍微减小字体 */
+        font-size: 0.85em !important;
+        /* 稍微减小字体 */
         overflow: hidden;
         text-overflow: ellipsis;
         display: -webkit-box;
-        -webkit-line-clamp: 2; /* 限制标题最多显示两行 */
+        -webkit-line-clamp: 2;
+        /* 限制标题最多显示两行 */
+        line-clamp: 2;
         -webkit-box-orient: vertical;
     }
 }
@@ -168,6 +170,7 @@ body.light-theme .weekly-placeholder {
 
 /* 周刊页面动态样式 - 仅在非移动端生效 */
 @media (min-width: 641px) {
+
     /* 两栏布局 */
     .weekly-grid.columns-2 {
         grid-template-columns: repeat(2, 1fr) !important;
@@ -178,5 +181,3 @@ body.light-theme .weekly-placeholder {
         grid-template-columns: repeat(3, 1fr) !important;
     }
 }
-
-

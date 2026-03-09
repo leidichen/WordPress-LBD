@@ -187,6 +187,9 @@ function custom_posts_per_page($query){
     }
 
     if($query->is_archive()){
+        if (is_category('weekly')) {
+            $query->set('posts_per_page', 24); // 周刊分类每页24篇
+        }
         if (function_exists('get_flash_category_term')) {
             $flash_category = get_flash_category_term();
             if ($flash_category && !is_category($flash_category->term_id) && !is_flash_idea_page()) {
