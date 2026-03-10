@@ -53,7 +53,7 @@ get_header(); ?>
                             ?>
                             <div class="idea-card-container <?php echo $card_extra_class; ?>">
                                 <div class="idea-card-header">
-                                    <span class="idea-timestamp"><?php echo get_the_time('m-d H:i'); ?></span>
+                                    <span class="idea-timestamp"><?php echo get_the_time('n月j日 H:i'); ?></span>
                                     <div class="idea-meta">
                                         <span class="idea-word-count"><?php echo get_flash_word_count(); ?></span>
                                     </div>

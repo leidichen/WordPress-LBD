@@ -28,34 +28,18 @@ html.light-theme {
     --idea-card-time: var(--idea-card-time-light);
 }
 
-/* 强制为闪念页面设置背景色，防止移动端滑动变暗 */
-html.page-template-idea,
-html.page-template-idea-php,
-body.page-template-idea,
-body.page-template-idea-php {
-    background-color: var(--background-color) !important;
-    min-height: 100vh; /* 确保背景色撑满视口 */
-    transition: background-color 0.3s ease; /* 允许背景色随主题切换平滑过渡 */
-}
-
-/* 移除 main 的背景色，避免多层背景导致的渲染差异 */
-body.page-template-idea main,
-body.page-template-idea-php main {
-    background-color: transparent !important;
-    min-height: 100vh;
-}
+/* 闪念页不再单独修改 html/body，让它复用全局布局规则 */
 
 .idea-container {
     max-width: 640px;
     margin: 0 auto;
-    padding: 20px;
-    background-color: transparent !important; /* 透出 body 背景 */
+    padding: 20px 0;
 }
 
 .idea-grid {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 0;
 }
 
 .idea-card {
@@ -71,15 +55,15 @@ body.page-template-idea-php main {
 }
 
 .idea-card-container {
-    /* background: var(--idea-card-bg) !important; */
-    background: transparent !important; /* 全局透明，彻底解决颜色不一致问题 */
-    border: 1px solid var(--idea-card-border);
-    padding: 16px;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--idea-card-border);
+    padding: 16px 20px;
     margin: 0;
     width: 100%;
     box-sizing: border-box;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-    border-radius: var(--idea-card-radius, 12px);
+    box-shadow: none;
+    border-radius: 0;
     user-select: text;
     position: relative;
     transform-origin: center;
@@ -87,7 +71,11 @@ body.page-template-idea-php main {
     flex-direction: column;
     -webkit-tap-highlight-color: transparent;
     transition: none !important;
-    /* 强制禁用所有过渡 */
+}
+
+.idea-card:first-child .idea-card-container {
+    border-top: 0;
+    padding-top: 0;
 }
 
 .idea-card-header {
@@ -105,24 +93,11 @@ body.page-template-idea-php main {
     align-items: center;
 }
 
-.idea-timestamp {
-    color: var(--idea-card-time);
-    font-weight: 500;
-    font-size: 0.8em;
-    font-family: monospace;
-}
-
-.idea-time-display {
-    color: var(--idea-card-time);
-    font-size: 0.85em;
-    font-family: monospace;
-    white-space: nowrap;
-}
-
+.idea-timestamp,
 .idea-word-count {
     color: var(--idea-card-time);
     font-weight: 500;
-    font-size: 0.8em;
+    font-size: 0.9em;
     font-family: monospace;
     white-space: nowrap;
 }
@@ -131,7 +106,7 @@ body.page-template-idea-php main {
     margin-bottom: 10px;
     line-height: 1.6;
     color: var(--idea-card-text);
-    font-size: 0.92em !important;
+    font-size: 15px !important;
     text-align: justify !important;
     text-justify: inter-ideograph;
     width: 100% !important;
@@ -265,136 +240,6 @@ body.page-template-idea-php main {
     /* 移除 transition，确保变形是即时的 */
 }
 
-.idea-lightbox-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 10000;
-    display: none; /* 默认隐藏，防止意外显示 */
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease; /* 添加过渡效果 */
-}
-
-.idea-lightbox-overlay.active {
-    display: flex; /* 激活时才显示 */
-    opacity: 1;
-}
-
-.idea-lightbox-content {
-    position: relative;
-    max-width: 90%;
-    max-height: 90%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.idea-lightbox-image-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.idea-lightbox-image {
-    max-width: 100%;
-    max-height: 80vh;
-    object-fit: contain;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
-}
-
-.idea-lightbox-close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    color: white;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10001;
-}
-
-.idea-lightbox-close:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.idea-lightbox-counter {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    color: white;
-    font-size: 14px;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 5px 10px;
-    border-radius: 4px;
-    z-index: 10001;
-}
-
-.idea-lightbox-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 50px;
-    height: 50px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    color: white;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10001;
-}
-
-.idea-lightbox-nav:hover {
-    background: rgba(0, 0, 0, 0.7);
-}
-
-.idea-lightbox-nav.prev {
-    left: 20px;
-}
-
-.idea-lightbox-nav.next {
-    right: 20px;
-}
-
-.idea-lightbox-indicator {
-    position: absolute;
-    bottom: 20px;
-    display: flex;
-    gap: 8px;
-    z-index: 10001;
-}
-
-.idea-lightbox-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.4);
-    cursor: pointer;
-}
-
-.idea-lightbox-dot.active {
-    background: white;
-}
-
-.idea-lightbox-dot:hover {
-    background: rgba(255, 255, 255, 0.7);
-}
-
 .idea-empty {
     text-align: center;
     padding: 50px 20px;
@@ -408,15 +253,12 @@ body.page-template-idea-php main {
 
 @media (max-width: 768px) {
     .idea-container {
-        padding: 15px;
+        padding: 16px 0;
     }
 
     .idea-card-container {
-        padding: 15px;
+        padding: 14px 16px;
         margin: 0;
-        background: transparent !important; /* 移动端卡片背景透明，透出页面背景 */
-        box-shadow: none;
-        transition: background-color 0.3s ease;
     }
 
     .idea-card-header {
@@ -424,7 +266,7 @@ body.page-template-idea-php main {
     }
 
     .idea-card-content {
-        font-size: 0.9em !important;
+        font-size: 15px !important;
         line-height: 1.7;
         width: 100% !important;
     }
@@ -445,20 +287,16 @@ body.page-template-idea-php main {
 
 @media (max-width: 480px) {
     .idea-container {
-        padding: 12px;
+        padding: 12px 0;
     }
 
     .idea-card-container {
-        padding: 12px;
+        padding: 12px 12px;
         margin: 0;
-        background: transparent !important; /* 移动端卡片背景透明，透出页面背景 */
-        box-shadow: none;
-        border: 1px solid var(--idea-card-border);
-        transition: background-color 0.3s ease;
     }
 
     .idea-card-content {
-        font-size: 0.85em !important;
+        font-size: 15px !important;
         line-height: 1.6;
         width: 100% !important;
     }

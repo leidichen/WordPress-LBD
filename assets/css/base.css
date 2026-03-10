@@ -378,3 +378,18 @@ pre code {
     line-height: 1.75;
     letter-spacing: 1px;
 }
+
+.content p {
+    margin: 0 0 1.4em;
+}
+
+.content h2,
+.content h3 {
+    margin-top: 2.4em;
+    margin-bottom: 0.9em;
+}
+
+.content h2:first-child,
+.content h3:first-child {
+    margin-top: 0;
+}

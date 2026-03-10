@@ -1,6 +1,6 @@
 <?php
 // 主题设置
-define('LBD_VERSION', '1.2.5');
+define('LBD_VERSION', '1.2.6-2');
 
 /**
  * 自动更新设置 (基于 GitHub)
@@ -104,7 +104,7 @@ if ( ! function_exists( 'yayu_load_style' ) ) :
 				'dear-idea-style',
 				get_template_directory_uri() . '/assets/css/idea.css',
 				array('dear-base-style'),
-				'1.0.1' // 更新版本号以清除缓存
+				LBD_VERSION
 			);
 		}
 		// 注册并内联一个小脚本用于主题亮/暗切换
@@ -113,7 +113,6 @@ if ( ! function_exists( 'yayu_load_style' ) ) :
 		$script = "(function(){var t=document.getElementById('theme-toggle');if(!t)return;var b=document.documentElement;var sunIcon=t.querySelector('.sun'),moonIcon=t.querySelector('.moon');var m=document.getElementById('theme-color-meta');function persist(theme){try{localStorage.setItem('dear-theme',theme);document.cookie='dear-theme='+theme+'; path=/; max-age=31536000; SameSite=Lax';}catch(e){}}function sync(){var isLight=b.classList.contains('light-theme');t.setAttribute('aria-pressed',isLight?'true':'false');if(sunIcon&&moonIcon){sunIcon.style.display=isLight?'none':'inline';moonIcon.style.display=isLight?'inline':'none';}if(m)m.setAttribute('content',isLight?'#ffffff':'#022430');}t.addEventListener('click',function(){var isLight=b.classList.contains('light-theme');if(isLight){b.classList.remove('light-theme');persist('dark');}else{b.classList.add('light-theme');persist('light');}sync();});sync();})();";
 		wp_add_inline_script('dear-theme-toggle', $script);
 
-		// 闪念页面交互脚本
 		if (is_page_template('idea.php')) {
 			wp_enqueue_script(
 				'dear-idea-page',
@@ -126,21 +125,6 @@ if ( ! function_exists( 'yayu_load_style' ) ) :
 	}
 	add_action( 'wp_enqueue_scripts', 'yayu_load_style' );
 endif;
-
-// 输出用户自定义背景色为 CSS 变量，确保闪念页面能跟随变化
-// 移除旧的 dear_custom_background_css_variable，因为现在由 dear_custom_background_cb 统一接管
-/*
-if ( ! function_exists( 'dear_custom_background_css_variable' ) ) :
-	function dear_custom_background_css_variable() {
-		$background_color = get_background_color();
-		// 如果获取到背景色（且不是默认值，或者用户明确设置了），则覆盖变量
-		if ( $background_color && $background_color !== '022430' ) {
-			echo "<style>:root { --background-color: #" . esc_attr($background_color) . "; }</style>\n";
-		}
-	}
-	add_action( 'wp_head', 'dear_custom_background_css_variable', 100 ); // 晚一点执行，确保覆盖默认样式
-endif;
-*/
 
 if ( ! function_exists( 'dear_output_theme_init_script' ) ) :
 	function dear_output_theme_init_script() {
@@ -431,24 +415,6 @@ function dear_flash_customizer($wp_customize) {
         'description' => '输入要使用流式布局的分类 slug。例如 "flash"、"status" 或 "daily"。'
     ));
     
-    // 显示字数设置
-    $wp_customize->add_setting('flash_content_length', array(
-        'default' => 280,
-        'sanitize_callback' => 'absint',
-    ));
-    
-    $wp_customize->add_control('flash_content_length', array(
-        'label' => '内容显示字数',
-        'section' => 'dear_flash_settings',
-        'type' => 'number',
-        'input_attrs' => array(
-            'min' => 100,
-            'max' => 500,
-            'step' => 50,
-        ),
-        'description' => '设置卡片中显示的内容字数（中文字符）'
-    ));
-    
     // 卡片圆角大小设置
     $wp_customize->add_setting('flash_card_radius', array(
         'default' => 12,
@@ -517,11 +483,6 @@ function get_flash_category_term() {
 }
 
 // 获取闪念内容长度
-function get_flash_content_length() {
-    return get_theme_mod('flash_content_length', 280);
-}
-
-// 获取闪念卡片圆角大小
 function get_flash_card_radius() {
     return get_theme_mod('flash_card_radius', 12);
 }
@@ -533,7 +494,6 @@ function is_flash_idea_page() {
 
 // 首页设置面板
 function dear_home_customizer($wp_customize) {
-    // 首页设置面板
     $wp_customize->add_section('dear_home_settings', array(
         'title' => '首页设置',
         'priority' => 30,
@@ -669,7 +629,15 @@ function get_twitter_style_content($length = 300) {
             'width' => true,
             'height' => true,
             'class' => true,
-            'style' => true
+            'style' => true,
+            'srcset' => true,
+            'sizes' => true,
+            'loading' => true,
+            'decoding' => true,
+            'fetchpriority' => true,
+            'data-src' => true,
+            'data-original' => true,
+            'data-lazy-src' => true
         ),
         'p' => array('class' => true, 'style' => true),
         'br' => array(),
@@ -681,8 +649,14 @@ function get_twitter_style_content($length = 300) {
     $content_filtered = wp_kses($content, $allowed_tags);
     
     // 提取所有图片标签和信息
-    preg_match_all('/<img[^>]+>/i', $content_filtered, $images);
+    preg_match_all('/<img[^>]+>/i', $content, $images);
     $image_tags = isset($images[0]) ? $images[0] : array();
+    if (empty($image_tags) && has_post_thumbnail()) {
+        $thumbnail_html = get_the_post_thumbnail(get_the_ID(), 'large');
+        if (!empty($thumbnail_html)) {
+            $image_tags[] = $thumbnail_html;
+        }
+    }
     
     // 解析图片信息
     $image_data = array();
@@ -691,14 +665,39 @@ function get_twitter_style_content($length = 300) {
         if (preg_match('/src=["\']([^"\']*)["\']/', $img_tag, $matches)) {
             $img_src = $matches[1];
         }
+        if (!$img_src && preg_match('/data-src=["\']([^"\']*)["\']/', $img_tag, $matches)) {
+            $img_src = $matches[1];
+            $img_tag = preg_replace('/<img/i', '<img src="' . esc_url($img_src) . '"', $img_tag, 1);
+        } elseif (!$img_src && preg_match('/data-original=["\']([^"\']*)["\']/', $img_tag, $matches)) {
+            $img_src = $matches[1];
+            $img_tag = preg_replace('/<img/i', '<img src="' . esc_url($img_src) . '"', $img_tag, 1);
+        } elseif (!$img_src && preg_match('/data-lazy-src=["\']([^"\']*)["\']/', $img_tag, $matches)) {
+            $img_src = $matches[1];
+            $img_tag = preg_replace('/<img/i', '<img src="' . esc_url($img_src) . '"', $img_tag, 1);
+        }
+        if (!$img_src && preg_match('/srcset=["\']([^"\']*)["\']/', $img_tag, $matches)) {
+            $srcset = trim($matches[1]);
+            if ($srcset !== '') {
+                $first = trim(explode(',', $srcset)[0]);
+                $parts = preg_split('/\s+/', $first);
+                $img_src = $parts[0] ?? '';
+            }
+        }
+        if (!$img_src && preg_match('/data-srcset=["\']([^"\']*)["\']/', $img_tag, $matches)) {
+            $srcset = trim($matches[1]);
+            if ($srcset !== '') {
+                $first = trim(explode(',', $srcset)[0]);
+                $parts = preg_split('/\s+/', $first);
+                $img_src = $parts[0] ?? '';
+            }
+        }
         if (preg_match('/alt=["\']([^"\']*)["\']/', $img_tag, $matches)) {
             $img_alt = $matches[1];
         }
-        // 确保图片标签包含必要的属性
-        $clean_img_tag = $img_tag;
-        if (!strpos($img_tag, 'style=')) {
-            $clean_img_tag = str_replace('>', ' style="max-width: 100%; height: auto;">', $clean_img_tag);
+        if (!$img_src) {
+            continue;
         }
+        $clean_img_tag = '<img src="' . esc_url($img_src) . '" alt="' . esc_attr($img_alt) . '" style="max-width: 100%; height: auto;" loading="lazy" decoding="async">';
         $image_data[] = array('src' => $img_src, 'alt' => $img_alt, 'tag' => $clean_img_tag);
     }
     

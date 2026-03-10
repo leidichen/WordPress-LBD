@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: 搜索结果页
+Template Name: 搜索模板
 */
 get_header(); ?>
 
