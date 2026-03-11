@@ -5,7 +5,7 @@ Template Name: 卡片模板
 
 get_header(); ?>
 
-<div class="idea-container" style="--idea-card-radius: <?php echo (int) get_flash_card_radius(); ?>px;">
+<div class="idea-container" style="--idea-clamp-lines: <?php echo (int) get_flash_clamp_lines(); ?>;" data-clamp-enabled="<?php echo get_flash_clamp_enabled() ? '1' : '0'; ?>">
     
     <div class="rss-header" style="text-align:right; margin-bottom:20px; padding-right: 10px;">
         <?php 
@@ -32,7 +32,7 @@ get_header(); ?>
         $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
         $args = array(
             'cat' => $flash_category->term_id,
-            'posts_per_page' => 15, // 卡片每页 15 篇
+            'posts_per_page' => get_flash_posts_per_page(),
             'paged' => $paged,
             'orderby' => 'date',
             'order' => 'DESC'
@@ -55,6 +55,9 @@ get_header(); ?>
                                 <div class="idea-card-header">
                                     <span class="idea-timestamp"><?php echo get_the_time('n月j日 H:i'); ?></span>
                                     <div class="idea-meta">
+                                        <?php if (function_exists('get_weather_enabled') && get_weather_enabled() && get_the_date('Ymd') === date_i18n('Ymd')): ?>
+                                            <span class="idea-weather" aria-label="weather"></span>
+                                        <?php endif; ?>
                                         <span class="idea-word-count"><?php echo get_flash_word_count(); ?></span>
                                     </div>
                                 </div>
@@ -75,6 +78,20 @@ get_header(); ?>
                                             <span class="idea-expand-text">显示更多</span>
                                         </div>
                                     <?php endif; ?>
+                                </div>
+                                <div class="idea-card-footer">
+                                    <button class="idea-action-btn copy-rich" type="button" aria-label="复制文本">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                                            <rect x="3" y="3" width="13" height="13" rx="2"></rect>
+                                        </svg>
+                                    </button>
+                                    <button class="idea-action-btn copy-md" type="button" aria-label="复制Markdown">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="3" width="18" height="14" rx="2"></rect>
+                                            <path d="M6 12V9l3 3V9h2v6H6zM16 9h-3v6h3l3-3-3-3z"></path>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,6 @@
 <?php
 // 主题设置
-define('LBD_VERSION', '1.2.6');
+define('LBD_VERSION', '1.2.7');
 
 /**
  * 自动更新设置 (基于 GitHub)
@@ -100,6 +100,12 @@ if ( ! function_exists( 'yayu_load_style' ) ) :
 			);
 		}
 		if (is_page_template('idea.php')) {
+			wp_enqueue_style(
+				'qweather-icons',
+				'https://cdn.jsdelivr.net/npm/qweather-icons@1.3.2/font/qweather-icons.css',
+				array(),
+				'1.3.2'
+			);
 			wp_enqueue_style(
 				'dear-idea-style',
 				get_template_directory_uri() . '/assets/css/idea.css',
@@ -415,22 +421,48 @@ function dear_flash_customizer($wp_customize) {
         'description' => '输入要使用流式布局的分类 slug。例如 "flash"、"status" 或 "daily"。'
     ));
     
-    // 卡片圆角大小设置
-    $wp_customize->add_setting('flash_card_radius', array(
-        'default' => 12,
+    // 文本折叠开关
+    $wp_customize->add_setting('flash_clamp_enabled', array(
+        'default' => 1,
         'sanitize_callback' => 'absint',
     ));
-    
-    $wp_customize->add_control('flash_card_radius', array(
-        'label' => '卡片圆角大小',
+    $wp_customize->add_control('flash_clamp_enabled', array(
+        'label' => '启用文本折叠',
         'section' => 'dear_flash_settings',
-        'type' => 'range',
+        'type' => 'checkbox',
+        'description' => '关闭后，卡片文本默认全展开，不显示“显示更多”'
+    ));
+    // 折叠行数
+    $wp_customize->add_setting('flash_clamp_lines', array(
+        'default' => 20,
+        'sanitize_callback' => 'absint',
+    ));
+    $wp_customize->add_control('flash_clamp_lines', array(
+        'label' => '折叠行数',
+        'section' => 'dear_flash_settings',
+        'type' => 'number',
         'input_attrs' => array(
-            'min' => 0,
-            'max' => 20,
-            'step' => 2,
+            'min' => 1,
+            'max' => 50,
+            'step' => 1,
         ),
-        'description' => '设置卡片的圆角大小（像素）'
+        'description' => '当启用折叠时，超过该行数则折叠（例如 20）'
+    ));
+
+    $wp_customize->add_setting('flash_posts_per_page', array(
+        'default' => 15,
+        'sanitize_callback' => 'absint',
+    ));
+    $wp_customize->add_control('flash_posts_per_page', array(
+        'label' => '每页卡片数',
+        'section' => 'dear_flash_settings',
+        'type' => 'number',
+        'input_attrs' => array(
+            'min' => 5,
+            'max' => 100,
+            'step' => 5,
+        ),
+        'description' => '设置分页每页显示的卡片数量'
     ));
 
     // 修改默认菜单名称
@@ -482,10 +514,9 @@ function get_flash_category_term() {
     return false;
 }
 
-// 获取闪念内容长度
-function get_flash_card_radius() {
-    return get_theme_mod('flash_card_radius', 12);
-}
+function get_flash_clamp_enabled() { return (bool) get_theme_mod('flash_clamp_enabled', 1); }
+function get_flash_clamp_lines() { return (int) get_theme_mod('flash_clamp_lines', 20); }
+function get_flash_posts_per_page() { return (int) get_theme_mod('flash_posts_per_page', 15); }
 
 // 检查是否为闪念独立页面
 function is_flash_idea_page() {
@@ -563,6 +594,23 @@ function dear_weekly_customizer($wp_customize) {
         ),
         'description' => '调整卡片之间的间距（10-50px）'
     ));
+
+    // 每页卡片数（分页）
+    $wp_customize->add_setting('weekly_posts_per_page', array(
+        'default' => 24,
+        'sanitize_callback' => 'absint',
+    ));
+    $wp_customize->add_control('weekly_posts_per_page', array(
+        'label' => '每页卡片数',
+        'section' => 'dear_weekly_settings',
+        'type' => 'number',
+        'input_attrs' => array(
+            'min' => 6,
+            'max' => 96,
+            'step' => 6,
+        ),
+        'description' => '设置网格页每页显示的卡片数量'
+    ));
 }
 add_action('customize_register', 'dear_weekly_customizer');
 
@@ -574,6 +622,11 @@ function get_weekly_grid_columns() {
 // 获取周刊卡片间距设置
 function get_weekly_card_spacing() {
     return get_theme_mod('weekly_card_spacing', '20');
+}
+
+// 获取网格每页卡片数
+function get_weekly_posts_per_page() {
+    return get_theme_mod('weekly_posts_per_page', 24);
 }
 
 // 闪念文章字数统计
@@ -620,6 +673,10 @@ function get_twitter_style_content($length = 300) {
     $content = apply_filters('the_content', $content);
     $content = str_replace(']]>', ']]>', $content);
     
+    // 将任务复选框替换为安全的标记元素
+    $content = preg_replace('/<input[^>]*type=["\']checkbox["\'][^>]*checked[^>]*>/i', '<span class="todo-checkbox checked"></span>', $content);
+    $content = preg_replace('/<input[^>]*type=["\']checkbox["\'][^>]*>/i', '<span class="todo-checkbox"></span>', $content);
+    
     // 保留安全的HTML标签
     $allowed_tags = array(
         'img' => array(
@@ -643,7 +700,20 @@ function get_twitter_style_content($length = 300) {
         'br' => array(),
         'strong' => array(),
         'em' => array(),
-        'a' => array('href' => true, 'title' => true, 'target' => true)
+        'a' => array('href' => true, 'title' => true, 'target' => true),
+        'ul' => array('class' => true, 'style' => true),
+        'ol' => array('class' => true, 'style' => true),
+        'li' => array('class' => true, 'style' => true),
+        'blockquote' => array('class' => true, 'style' => true),
+        'h1' => array('class' => true, 'style' => true),
+        'h2' => array('class' => true, 'style' => true),
+        'h3' => array('class' => true, 'style' => true),
+        'h4' => array('class' => true, 'style' => true),
+        'h5' => array('class' => true, 'style' => true),
+        'h6' => array('class' => true, 'style' => true),
+        'code' => array('class' => true, 'style' => true),
+        'pre' => array('class' => true, 'style' => true),
+        'span' => array('class' => true, 'style' => true)
     );
     
     $content_filtered = wp_kses($content, $allowed_tags);
@@ -701,11 +771,11 @@ function get_twitter_style_content($length = 300) {
         $image_data[] = array('src' => $img_src, 'alt' => $img_alt, 'tag' => $clean_img_tag);
     }
     
-    // 移除图片标签后获取纯文本内容
+    // 移除图片标签，保留其余富文本结构用于展示
     $content_without_images = preg_replace('/<img[^>]+>/i', '', $content_filtered);
+    $rich_html = $content_without_images;
     
-    // 在去除标签前，先将段落和换行标签转换为换行符，确保段落结构不丢失
-    // </p> 转换为双换行以保持段落分隔，<br> 转换为单换行
+    // 另外生成纯文本用于长度统计与截断
     $content_with_breaks = str_replace(array('</p>', '<br />', '<br>'), array("\n\n", "\n", "\n"), $content_without_images);
     $text_content = wp_strip_all_tags($content_with_breaks);
     
@@ -721,9 +791,9 @@ function get_twitter_style_content($length = 300) {
             $truncated_text = mb_substr($text_content, 0, $length, 'UTF-8');
             return array(
                 'preview' => $images_display['preview'] . wpautop($truncated_text . '...'),
-                'full' => $images_display['full'] . wpautop($text_content),
-                'images_html' => $images_display['full'], // 新增：仅图片HTML
-                'text_html' => wpautop($text_content),     // 新增：仅文本HTML
+                'full' => $images_display['full'] . $rich_html,
+                'images_html' => $images_display['full'],
+                'text_html' => $rich_html,
                 'gallery_data' => $images_display['gallery_data'],
                 'image_count' => count($image_data),
                 'is_truncated' => true
@@ -731,10 +801,10 @@ function get_twitter_style_content($length = 300) {
         } else {
             // 文本未超长
             return array(
-                'preview' => $images_display['preview'] . wpautop($text_content),
-                'full' => $images_display['full'] . wpautop($text_content),
-                'images_html' => $images_display['full'], // 新增
-                'text_html' => wpautop($text_content),     // 新增
+                'preview' => $images_display['preview'] . $rich_html,
+                'full' => $images_display['full'] . $rich_html,
+                'images_html' => $images_display['full'],
+                'text_html' => $rich_html,
                 'gallery_data' => $images_display['gallery_data'],
                 'image_count' => count($image_data),
                 'is_truncated' => false
@@ -746,18 +816,18 @@ function get_twitter_style_content($length = 300) {
             $truncated_text = mb_substr($text_content, 0, $length, 'UTF-8');
             return array(
                 'preview' => wpautop($truncated_text . '...'),
-                'full' => wpautop($text_content),
-                'images_html' => '', // 新增
-                'text_html' => wpautop($text_content), // 新增
+                'full' => $rich_html,
+                'images_html' => '',
+                'text_html' => $rich_html,
                 'image_count' => 0,
                 'is_truncated' => true
             );
         } else {
             return array(
-                'preview' => wpautop($text_content),
-                'full' => wpautop($text_content),
-                'images_html' => '', // 新增
-                'text_html' => wpautop($text_content), // 新增
+                'preview' => $rich_html,
+                'full' => $rich_html,
+                'images_html' => '',
+                'text_html' => $rich_html,
                 'image_count' => 0,
                 'is_truncated' => false
             );
@@ -829,5 +899,245 @@ function get_weekly_cover_image() {
     
     return false;
 }
+
+// 天气：REST 路由与自定义项
+add_action('rest_api_init', 'lbd_register_weather_route');
+function lbd_register_weather_route() {
+    register_rest_route('lbd/v1', '/weather', array(
+        'methods'  => 'GET',
+        'callback' => 'lbd_get_today_weather',
+        'permission_callback' => '__return_true'
+    ));
+}
+
+function get_weather_enabled() { return (bool) get_theme_mod('weather_enabled', 0); }
+function get_qweather_location() { return trim(get_theme_mod('qweather_location', '')); }
+function get_qweather_api_key() { return trim(get_theme_mod('qweather_api_key', '')); }
+
+function lbd_get_today_weather(WP_REST_Request $req) {
+    if (!get_weather_enabled()) return new WP_REST_Response(null, 204);
+    $key = get_qweather_api_key();
+    $loc = get_qweather_location();
+    if (empty($key) || empty($loc)) return new WP_REST_Response(array('error' => 'missing'), 400);
+
+    $cache_key = 'lbd_weather_3d_' . md5($loc . '|' . date_i18n('Ymd'));
+    $cached = get_transient($cache_key);
+    if ($cached) return rest_ensure_response($cached);
+
+    $url = add_query_arg(array(
+        'location' => $loc,
+        'key' => $key
+    ), 'https://devapi.qweather.com/v7/weather/3d');
+
+    $resp = wp_remote_get($url, array('timeout' => 8));
+    if (is_wp_error($resp)) return new WP_REST_Response(null, 204);
+
+    $status = wp_remote_retrieve_response_code($resp);
+    $body = json_decode(wp_remote_retrieve_body($resp), true);
+    if ($status !== 200 || empty($body['daily'])) return new WP_REST_Response(null, 204);
+
+    $today = date_i18n('Y-m-d');
+    $todayItem = null;
+    foreach ($body['daily'] as $item) {
+        if (isset($item['fxDate']) && $item['fxDate'] === $today) { $todayItem = $item; break; }
+    }
+    if (!$todayItem) { $todayItem = $body['daily'][0]; }
+
+    $out = array(
+        'iconDay' => isset($todayItem['iconDay']) ? $todayItem['iconDay'] : '',
+        'textDay' => isset($todayItem['textDay']) ? $todayItem['textDay'] : '',
+        'iconNight' => isset($todayItem['iconNight']) ? $todayItem['iconNight'] : '',
+        'textNight' => isset($todayItem['textNight']) ? $todayItem['textNight'] : '',
+        'tempMax' => isset($todayItem['tempMax']) ? $todayItem['tempMax'] : '',
+        'tempMin' => isset($todayItem['tempMin']) ? $todayItem['tempMin'] : ''
+    );
+    set_transient($cache_key, $out, 30 * MINUTE_IN_SECONDS);
+    return rest_ensure_response($out);
+}
+
+function dear_weather_customizer($wp_customize) {
+    $wp_customize->add_section('dear_weather_settings', array(
+        'title' => '天气设置',
+        'priority' => 40,
+        'description' => '用于闪念页面当天卡片天气图标'
+    ));
+
+    $wp_customize->add_setting('weather_enabled', array(
+        'default' => 0,
+        'sanitize_callback' => 'absint',
+    ));
+    $wp_customize->add_control('weather_enabled', array(
+        'label' => '启用天气图标',
+        'section' => 'dear_weather_settings',
+        'type' => 'checkbox'
+    ));
+
+    $wp_customize->add_setting('qweather_location', array(
+        'default' => '',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('qweather_location', array(
+        'label' => '位置（城市ID或经纬度）',
+        'section' => 'dear_weather_settings',
+        'type' => 'text',
+        'description' => '示例：101010100 或 39.9,116.3'
+    ));
+
+    $wp_customize->add_setting('qweather_api_key', array(
+        'default' => '',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('qweather_api_key', array(
+        'label' => '和风天气 API Key',
+        'section' => 'dear_weather_settings',
+        'type' => 'text'
+    ));
+
+    // 自定义器验证按钮
+    if (class_exists('WP_Customize_Control')) {
+        if (!class_exists('LBD_Verify_Button_Control')) {
+            class LBD_Verify_Button_Control extends WP_Customize_Control {
+                public $type = 'lbd_verify_button';
+                public function render_content() {
+                    ?>
+                    <span class="customize-control-title"><?php echo esc_html($this->label); ?></span>
+                    <?php if (!empty($this->description)) : ?>
+                        <span class="description customize-control-description"><?php echo wp_kses_post($this->description); ?></span>
+                    <?php endif; ?>
+                    <div class="lbd-weather-verify-row" style="display:flex;align-items:center;gap:10px;">
+                        <button type="button" class="button button-primary" id="lbd-weather-verify-btn">验证天气</button>
+                        <a id="lbd-weather-help-link" href="#" target="_blank" rel="noopener" aria-label="帮助" title="如何获取和风天气API与位置ID" style="display:inline-flex;align-items:center;color:inherit;text-decoration:none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 2-3 4"></path>
+                                <path d="M12 17h.01"></path>
+                            </svg>
+                        </a>
+                        <span id="lbd-weather-verify-result" style="line-height:28px;"></span>
+                    </div>
+                    <?php
+                }
+            }
+        }
+        $wp_customize->add_setting('qweather_verify_dummy', array(
+            'default' => '',
+            'sanitize_callback' => '__return_empty_string',
+        ));
+        $wp_customize->add_control(new LBD_Verify_Button_Control($wp_customize, 'qweather_verify_dummy', array(
+            'label' => '验证设置',
+            'section' => 'dear_weather_settings',
+            'settings' => 'qweather_verify_dummy',
+            'description' => '点击按钮验证当前位置与API Key是否有效（将实时请求和风3日预报）'
+        )));
+    }
+}
+add_action('customize_register', 'dear_weather_customizer');
+
+// 移除“背景图片”设置，仅保留背景色相关逻辑
+add_action('customize_register', function($wp_customize){
+    if ($wp_customize && method_exists($wp_customize, 'remove_section')) {
+        $wp_customize->remove_section('background_image');
+    }
+}, 999);
+
+// 自定义器控制面板脚本：验证按钮逻辑
+add_action('customize_controls_enqueue_scripts', function () {
+    wp_enqueue_script('customize-controls');
+    $script = <<<JS
+    (function() {
+      if (!window.wp || !wp.customize) return;
+      document.addEventListener('click', function(e){
+        var t = e.target;
+        if (!t || t.id !== 'lbd-weather-verify-btn') return;
+        var out = document.getElementById('lbd-weather-verify-result');
+        if (!out) {
+          out = document.createElement('span');
+          out.id = 'lbd-weather-verify-result';
+          out.style.marginLeft = '10px';
+          t.insertAdjacentElement('afterend', out);
+        }
+        var loc = wp.customize('qweather_location') && wp.customize('qweather_location').get();
+        var key = wp.customize('qweather_api_key') && wp.customize('qweather_api_key').get();
+        out.textContent = '';
+        if(!loc || !key){
+          out.textContent = '请先填写位置与API Key';
+          out.style.color = '#d63638';
+          return;
+        }
+        t.disabled = true;
+        out.textContent = '正在验证...';
+        out.style.color = '';
+        var url = '/wp-json/lbd/v1/weather/verify?location=' + encodeURIComponent(loc) + '&key=' + encodeURIComponent(key);
+        fetch(url, { credentials: 'same-origin' })
+          .then(function(r){
+            if (r.status === 204) return null;
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+          })
+          .then(function(data){
+            if(!data || !data.ok){
+              out.textContent = '验证失败：' + (data && data.msg ? data.msg : '接口无返回');
+              out.style.color = '#d63638';
+              return;
+            }
+            var detail = [];
+            if(data.iconDay) detail.push('iconDay ' + data.iconDay);
+            if(data.textDay) detail.push(data.textDay);
+            if(data.tempMin!=null && data.tempMax!=null) detail.push(data.tempMin + '–' + data.tempMax + '°C');
+            out.textContent = '验证成功' + (detail.length? '（' + detail.join(' / ') + '）' : '');
+            out.style.color = '#00a32a';
+          })
+          .catch(function(err){
+            out.textContent = '验证失败：' + (err && err.message ? err.message : '网络错误');
+            out.style.color = '#d63638';
+          })
+          .finally(function(){ t.disabled = false; });
+      });
+    })();
+    JS;
+    wp_add_inline_script('customize-controls', $script);
+});
+
+// 验证路由：使用传入的location与key进行即时检测
+add_action('rest_api_init', function () {
+    register_rest_route('lbd/v1', '/weather/verify', array(
+        'methods'  => 'GET',
+        'callback' => function (WP_REST_Request $req) {
+            $loc = trim($req->get_param('location'));
+            $key = trim($req->get_param('key'));
+            if (empty($loc) || empty($key)) {
+                return rest_ensure_response(array('ok' => false, 'msg' => '缺少参数'));
+            }
+            $cache_key = 'lbd_weather_verify_' . md5($loc . '|' . $key);
+            $cached = get_transient($cache_key);
+            if ($cached) return rest_ensure_response($cached);
+            $url = add_query_arg(array('location'=>$loc,'key'=>$key), 'https://devapi.qweather.com/v7/weather/3d');
+            $resp = wp_remote_get($url, array('timeout'=>8));
+            if (is_wp_error($resp)) {
+                return rest_ensure_response(array('ok'=>false,'msg'=>'请求失败'));
+            }
+            $code = wp_remote_retrieve_response_code($resp);
+            $body = json_decode(wp_remote_retrieve_body($resp), true);
+            if ($code !== 200 || empty($body['daily'])) {
+                $msg = isset($body['code']) ? ('接口返回 code ' . $body['code']) : '响应异常';
+                return rest_ensure_response(array('ok'=>false,'msg'=>$msg));
+            }
+            $today = date_i18n('Y-m-d');
+            $item = null;
+            foreach ($body['daily'] as $d) { if (!empty($d['fxDate']) && $d['fxDate']===$today) { $item=$d; break; } }
+            if (!$item) { $item = $body['daily'][0]; }
+            $out = array(
+                'ok' => true,
+                'iconDay' => isset($item['iconDay']) ? $item['iconDay'] : '',
+                'textDay' => isset($item['textDay']) ? $item['textDay'] : '',
+                'tempMax' => isset($item['tempMax']) ? $item['tempMax'] : null,
+                'tempMin' => isset($item['tempMin']) ? $item['tempMin'] : null
+            );
+            set_transient($cache_key, $out, 2 * MINUTE_IN_SECONDS);
+            return rest_ensure_response($out);
+        },
+        'permission_callback' => '__return_true'
+    ));
+});
 
 ?>

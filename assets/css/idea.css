@@ -73,6 +73,47 @@ html.light-theme {
     transition: none !important;
 }
 
+.idea-card-footer {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 8px;
+}
+.idea-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--idea-card-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--idea-card-time);
+    cursor: pointer;
+}
+.idea-action-btn svg {
+    width: 16px;
+    height: 16px;
+}
+.idea-action-btn:hover {
+    color: var(--idea-link-color);
+    border-color: var(--idea-link-color);
+}
+
+.idea-action-hint {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: var(--idea-link-color);
+    opacity: 0.95;
+}
+.idea-action-hint svg {
+    width: 16px;
+    height: 16px;
+}
+
 .idea-card:first-child .idea-card-container {
     border-top: 0;
     padding-top: 0;
@@ -86,6 +127,9 @@ html.light-theme {
     padding-bottom: 0;
     flex-shrink: 0;
 }
+
+.idea-meta .idea-weather { display: inline-flex; align-items: center; margin-left: 8px; color: var(--idea-card-time); }
+.idea-meta .idea-weather i { font-size: 16px; line-height: 1; display: inline-block; }
 
 .idea-meta {
     display: flex;
@@ -124,6 +168,67 @@ html.light-theme {
     text-justify: inter-ideograph;
 }
 
+.idea-card-content ul,
+.idea-card-content ol {
+    margin: 0 0 12px 1.2em;
+    padding: 0;
+    text-align: left;
+}
+.idea-card-content li {
+    margin-bottom: 6px;
+}
+.idea-card-content blockquote {
+    border-left: 2px solid var(--idea-card-border);
+    padding-left: 12px;
+    margin: 0 0 12px 0;
+    color: var(--idea-card-text);
+    opacity: 0.9;
+    text-align: left;
+}
+.idea-card-content h1,
+.idea-card-content h2,
+.idea-card-content h3,
+.idea-card-content h4,
+.idea-card-content h5,
+.idea-card-content h6 {
+    color: var(--idea-heading-color);
+    margin: 12px 0 8px 0;
+    text-align: left;
+}
+.idea-card-content code {
+    background: rgba(255,255,255,0.08);
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+.idea-card-content pre {
+    background: rgba(255,255,255,0.06);
+    padding: 10px;
+    border-radius: 6px;
+    overflow: auto;
+    text-align: left;
+}
+.idea-card-content .todo-checkbox {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 6px;
+    vertical-align: middle;
+    border: 1px solid var(--idea-card-border);
+    border-radius: 2px;
+    position: relative;
+}
+.idea-card-content .todo-checkbox.checked::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 0px;
+    width: 6px;
+    height: 10px;
+    border-right: 2px solid var(--idea-link-color);
+    border-bottom: 2px solid var(--idea-link-color);
+    transform: rotate(45deg);
+}
+
 .idea-card-container .idea-card-content br {
     display: block;
     content: "";
@@ -144,8 +249,8 @@ html.light-theme {
 /* 启用文本折叠（无论是否有图） */
 .idea-content-clamp {
     display: -webkit-box;
-    -webkit-line-clamp: 6;
-    line-clamp: 6;
+    -webkit-line-clamp: var(--idea-clamp-lines, 6);
+    line-clamp: var(--idea-clamp-lines, 6);
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -178,11 +283,26 @@ html.light-theme {
     text-decoration: underline;
 }
 
+[data-clamp-enabled="0"] .idea-content-clamp {
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    display: block;
+    overflow: visible;
+}
+[data-clamp-enabled="0"] .idea-expand-toggle {
+    display: none !important;
+}
+
 /* 内容中图片网格（由 PHP 输出 .image-gallery/.image-item） */
 .idea-card-content .image-gallery {
     display: flex;
     gap: 10px;
     margin-bottom: 12px;
+}
+
+/* 文本与图片之间留出一行间距（即使中间有“显示更多”占位元素） */
+.idea-card-content .idea-content-clamp ~ .image-gallery {
+    margin-top: 1.8em;
 }
 
 /* 单张图片与正文间距 */

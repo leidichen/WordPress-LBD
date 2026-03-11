@@ -20,7 +20,7 @@ get_header(); ?>
         $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
         $args = array(
             'cat' => $weekly_category->term_id,
-            'posts_per_page' => 24, // 网格每页 24 篇
+            'posts_per_page' => function_exists('get_weekly_posts_per_page') ? get_weekly_posts_per_page() : 24,
             'paged' => $paged,
             'orderby' => 'date',
             'order' => 'DESC'
