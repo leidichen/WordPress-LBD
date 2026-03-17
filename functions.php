@@ -2,7 +2,7 @@
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 // 主题设置
-define('LBD_VERSION', '1.2.7');
+define('LBD_VERSION', '1.2.9');
 
 /**
  * 自动更新设置 (基于 GitHub)
