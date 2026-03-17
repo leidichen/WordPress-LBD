@@ -1,6 +1,6 @@
 <?php
 // 主题设置
-define('LBD_VERSION', '1.2.7');
+define('LBD_VERSION', '1.2.8');
 
 /**
  * 自动更新设置 (基于 GitHub)
@@ -774,6 +774,9 @@ function get_twitter_style_content($length = 300) {
     // 移除图片标签，保留其余富文本结构用于展示
     $content_without_images = preg_replace('/<img[^>]+>/i', '', $content_filtered);
     $rich_html = $content_without_images;
+    
+    // 统一文本末尾与图片间距：移除结尾多余空段落/换行/空白，确保图片前固定由 CSS 控制的单行间距
+    $rich_html = preg_replace('/(?:\s|<br\s*\/?>|<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>)+$/i', '', $rich_html);
     
     // 另外生成纯文本用于长度统计与截断
     $content_with_breaks = str_replace(array('</p>', '<br />', '<br>'), array("\n\n", "\n", "\n"), $content_without_images);

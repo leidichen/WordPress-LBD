@@ -340,18 +340,15 @@
 
       function render(data) {
         var icon = (data && (data.iconDay || data.icon)) || '';
-        var text = (data && (data.textDay || data.text)) || '';
-        var max = data && data.tempMax ? data.tempMax : '';
-        var min = data && data.tempMin ? data.tempMin : '';
-        var label = text || '';
-        if (max !== '' && min !== '') label += (label ? ' ' : '') + (min + '–' + max + '°C');
-        var html = icon ? '<i class="qi-' + icon + '-fill" aria-hidden="true"></i>' : '';
+        var max = (data && (data.tempMax != null)) ? String(data.tempMax) : '';
+        var min = (data && (data.tempMin != null)) ? String(data.tempMin) : '';
+        var tempStr = (min !== '' && max !== '') ? (min + '–' + max + '℃') : '';
+        var html = '';
+        if (icon) html += '<i class="qi-' + icon + '-fill" aria-hidden="true"></i>';
+        if (tempStr) html += ' <span class="idea-temp">' + tempStr + '</span>';
         nodes.forEach(function (el) {
           el.innerHTML = html;
-          if (label) {
-            el.title = label;
-            el.setAttribute('aria-label', label);
-          }
+          if (tempStr) el.setAttribute('aria-label', tempStr);
         });
       }
     })();

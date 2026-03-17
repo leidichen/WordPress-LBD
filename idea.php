@@ -58,7 +58,6 @@ get_header(); ?>
                                         <?php if (function_exists('get_weather_enabled') && get_weather_enabled() && get_the_date('Ymd') === date_i18n('Ymd')): ?>
                                             <span class="idea-weather" aria-label="weather"></span>
                                         <?php endif; ?>
-                                        <span class="idea-word-count"><?php echo get_flash_word_count(); ?></span>
                                     </div>
                                 </div>
                                 <div class="idea-card-content" data-gallery='<?php echo esc_attr($content_data['gallery_data'] ?? ''); ?>' data-image-count='<?php echo $content_data['image_count'] ?? 0; ?>'>
@@ -87,11 +86,11 @@ get_header(); ?>
                                         </svg>
                                     </button>
                                     <button class="idea-action-btn copy-md" type="button" aria-label="复制Markdown">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <rect x="3" y="3" width="18" height="14" rx="2"></rect>
-                                            <path d="M6 12V9l3 3V9h2v6H6zM16 9h-3v6h3l3-3-3-3z"></path>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor" aria-hidden="true">
+                                            <path d="M128 128h768a42.666667 42.666667 0 0 1 42.666667 42.666667v682.666666a42.666667 42.666667 0 0 1-42.666667 42.666667H128a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667z m42.666667 85.333333v597.333334h682.666666V213.333333H170.666667z m128 448H213.333333v-298.666666h85.333334l85.333333 85.333333 85.333333-85.333333h85.333334v298.666666h-85.333334v-170.666666l-85.333333 85.333333-85.333333-85.333333v170.666666z m469.333333-128h85.333333l-128 128-128-128h85.333334v-170.666666h85.333333v170.666666z"></path>
                                         </svg>
                                     </button>
+                                    <span class="idea-word-count"><?php echo get_flash_word_count(); ?></span>
                                 </div>
                             </div>
                         </div>

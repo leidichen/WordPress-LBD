@@ -114,6 +114,11 @@ html.light-theme {
     height: 16px;
 }
 
+/* 将底部字数统计推到右侧 */
+.idea-card-footer .idea-word-count {
+    margin-left: auto;
+}
+
 .idea-card:first-child .idea-card-container {
     border-top: 0;
     padding-top: 0;
@@ -130,6 +135,7 @@ html.light-theme {
 
 .idea-meta .idea-weather { display: inline-flex; align-items: center; margin-left: 8px; color: var(--idea-card-time); }
 .idea-meta .idea-weather i { font-size: 16px; line-height: 1; display: inline-block; }
+.idea-meta .idea-weather .idea-temp { margin-left: 6px; font-size: 0.9em; font-family: monospace; color: inherit; letter-spacing: 0; }
 
 .idea-meta {
     display: flex;
