@@ -294,8 +294,9 @@
             }
             if (tag === 'ul') {
               c.querySelectorAll(':scope > li').forEach(function(li){
-                var chk = li.querySelector('input[type="checkbox"]');
-                var prefix = chk ? (chk.checked ? '- [x] ' : '- [ ] ') : '- ';
+                var chk = li.querySelector('input[type="checkbox"], .todo-checkbox');
+                var checked = !!(chk && (chk.checked || (chk.classList && chk.classList.contains('checked'))));
+                var prefix = chk ? (checked ? '- [x] ' : '- [ ] ') : '- ';
                 out.push(prefix + mdInline(li));
               });
               out.push('');
