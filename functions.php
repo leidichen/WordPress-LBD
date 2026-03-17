@@ -1,12 +1,13 @@
 <?php
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
 // 主题设置
-define('LBD_VERSION', '1.2.8');
+define('LBD_VERSION', '1.2.7');
 
 /**
  * 自动更新设置 (基于 GitHub)
  */
 require 'inc/plugin-update-checker/plugin-update-checker.php';
-use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 $myUpdateChecker = PucFactory::buildUpdateChecker(
 	'https://github.com/leidichen/WordPress-LBD/',
