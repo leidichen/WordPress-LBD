@@ -128,7 +128,7 @@ html.light-theme {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
     padding-bottom: 0;
     flex-shrink: 0;
 }

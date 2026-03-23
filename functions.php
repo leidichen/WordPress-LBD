@@ -2,7 +2,7 @@
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 // 主题设置
-define('LBD_VERSION', '1.2.9');
+define('LBD_VERSION', '1.3.0');
 
 /**
  * 自动更新设置 (基于 GitHub)
@@ -831,6 +831,9 @@ function get_twitter_style_content($length = 300) {
     // 移除图片标签，保留其余富文本结构用于展示
     $content_without_images = preg_replace('/<img[^>]+>/i', '', $content_filtered);
     $rich_html = $content_without_images;
+
+    // 清理开头由编辑器或同步插件插入的空段落/空白，避免正文被整体下推
+    $rich_html = preg_replace('/^(?:\s|&nbsp;|<br\s*\/?>|<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>)+/i', '', $rich_html);
     
     // 统一文本末尾与图片间距：移除结尾多余空段落/换行/空白，确保图片前固定由 CSS 控制的单行间距
     $rich_html = preg_replace('/(?:\s|<br\s*\/?>|<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>)+$/i', '', $rich_html);
@@ -974,34 +977,47 @@ function get_weather_enabled() { return (bool) get_theme_mod('weather_enabled', 
 function get_qweather_location() { return trim(get_theme_mod('qweather_location', '')); }
 function get_qweather_api_key() { return trim(get_theme_mod('qweather_api_key', '')); }
 
-function lbd_get_today_weather(WP_REST_Request $req) {
-    if (!get_weather_enabled()) return new WP_REST_Response(null, 204);
-    $key = get_qweather_api_key();
-    $loc = get_qweather_location();
-    if (empty($key) || empty($loc)) return new WP_REST_Response(array('error' => 'missing'), 400);
+function lbd_fetch_weather_snapshot($location, $api_key, $cache_ttl = 1800) {
+    if (empty($location) || empty($api_key)) {
+        return false;
+    }
 
-    $cache_key = 'lbd_weather_3d_' . md5($loc . '|' . date_i18n('Ymd'));
-    $cached = get_transient($cache_key);
-    if ($cached) return rest_ensure_response($cached);
+    $cache_key = 'lbd_weather_3d_' . md5($location . '|' . date_i18n('Ymd'));
+    if ($cache_ttl > 0) {
+        $cached = get_transient($cache_key);
+        if ($cached) {
+            return $cached;
+        }
+    }
 
     $url = add_query_arg(array(
-        'location' => $loc,
-        'key' => $key
+        'location' => $location,
+        'key' => $api_key
     ), 'https://devapi.qweather.com/v7/weather/3d');
 
     $resp = wp_remote_get($url, array('timeout' => 8));
-    if (is_wp_error($resp)) return new WP_REST_Response(null, 204);
+    if (is_wp_error($resp)) {
+        return false;
+    }
 
     $status = wp_remote_retrieve_response_code($resp);
     $body = json_decode(wp_remote_retrieve_body($resp), true);
-    if ($status !== 200 || empty($body['daily'])) return new WP_REST_Response(null, 204);
+    if ($status !== 200 || empty($body['daily'])) {
+        return false;
+    }
 
     $today = date_i18n('Y-m-d');
     $todayItem = null;
     foreach ($body['daily'] as $item) {
-        if (isset($item['fxDate']) && $item['fxDate'] === $today) { $todayItem = $item; break; }
+        if (isset($item['fxDate']) && $item['fxDate'] === $today) {
+            $todayItem = $item;
+            break;
+        }
     }
-    if (!$todayItem) { $todayItem = $body['daily'][0]; }
+
+    if (!$todayItem) {
+        $todayItem = $body['daily'][0];
+    }
 
     $out = array(
         'iconDay' => isset($todayItem['iconDay']) ? $todayItem['iconDay'] : '',
@@ -1011,7 +1027,63 @@ function lbd_get_today_weather(WP_REST_Request $req) {
         'tempMax' => isset($todayItem['tempMax']) ? $todayItem['tempMax'] : '',
         'tempMin' => isset($todayItem['tempMin']) ? $todayItem['tempMin'] : ''
     );
-    set_transient($cache_key, $out, 30 * MINUTE_IN_SECONDS);
+
+    if ($cache_ttl > 0) {
+        set_transient($cache_key, $out, $cache_ttl);
+    }
+
+    return $out;
+}
+
+function lbd_get_post_weather_snapshot($post_id = 0) {
+    $post_id = $post_id ? (int) $post_id : get_the_ID();
+    if ($post_id <= 0) {
+        return false;
+    }
+
+    $snapshot = get_post_meta($post_id, '_lbd_weather_snapshot', true);
+    return is_array($snapshot) ? $snapshot : false;
+}
+
+function lbd_capture_weather_snapshot_on_first_publish($new_status, $old_status, $post) {
+    if (!$post instanceof WP_Post || $post->post_type !== 'post') {
+        return;
+    }
+
+    if ($new_status !== 'publish' || $old_status === 'publish') {
+        return;
+    }
+
+    if (!get_weather_enabled() || lbd_get_post_weather_snapshot($post->ID)) {
+        return;
+    }
+
+    $flash_category = get_flash_category_term();
+    if (!$flash_category || !has_category((int) $flash_category->term_id, $post)) {
+        return;
+    }
+
+    $weather = lbd_fetch_weather_snapshot(get_qweather_location(), get_qweather_api_key());
+    if (!$weather) {
+        return;
+    }
+
+    $weather['capturedDate'] = current_time('Y-m-d');
+    $weather['capturedAt'] = current_time('mysql');
+    $weather['location'] = get_qweather_location();
+
+    update_post_meta($post->ID, '_lbd_weather_snapshot', $weather);
+}
+add_action('transition_post_status', 'lbd_capture_weather_snapshot_on_first_publish', 10, 3);
+
+function lbd_get_today_weather(WP_REST_Request $req) {
+    if (!get_weather_enabled()) return new WP_REST_Response(null, 204);
+    $key = get_qweather_api_key();
+    $loc = get_qweather_location();
+    if (empty($key) || empty($loc)) return new WP_REST_Response(array('error' => 'missing'), 400);
+
+    $out = lbd_fetch_weather_snapshot($loc, $key, 30 * MINUTE_IN_SECONDS);
+    if (!$out) return new WP_REST_Response(null, 204);
     return rest_ensure_response($out);
 }
 
@@ -1171,27 +1243,20 @@ add_action('rest_api_init', function () {
             $cache_key = 'lbd_weather_verify_' . md5($loc . '|' . $key);
             $cached = get_transient($cache_key);
             if ($cached) return rest_ensure_response($cached);
-            $url = add_query_arg(array('location'=>$loc,'key'=>$key), 'https://devapi.qweather.com/v7/weather/3d');
-            $resp = wp_remote_get($url, array('timeout'=>8));
-            if (is_wp_error($resp)) {
-                return rest_ensure_response(array('ok'=>false,'msg'=>'请求失败'));
-            }
-            $code = wp_remote_retrieve_response_code($resp);
-            $body = json_decode(wp_remote_retrieve_body($resp), true);
-            if ($code !== 200 || empty($body['daily'])) {
+            $weather = lbd_fetch_weather_snapshot($loc, $key, 0);
+            if (!$weather) {
+                $url = add_query_arg(array('location'=>$loc,'key'=>$key), 'https://devapi.qweather.com/v7/weather/3d');
+                $resp = wp_remote_get($url, array('timeout'=>8));
+                $body = is_wp_error($resp) ? array() : json_decode(wp_remote_retrieve_body($resp), true);
                 $msg = isset($body['code']) ? ('接口返回 code ' . $body['code']) : '响应异常';
                 return rest_ensure_response(array('ok'=>false,'msg'=>$msg));
             }
-            $today = date_i18n('Y-m-d');
-            $item = null;
-            foreach ($body['daily'] as $d) { if (!empty($d['fxDate']) && $d['fxDate']===$today) { $item=$d; break; } }
-            if (!$item) { $item = $body['daily'][0]; }
             $out = array(
                 'ok' => true,
-                'iconDay' => isset($item['iconDay']) ? $item['iconDay'] : '',
-                'textDay' => isset($item['textDay']) ? $item['textDay'] : '',
-                'tempMax' => isset($item['tempMax']) ? $item['tempMax'] : null,
-                'tempMin' => isset($item['tempMin']) ? $item['tempMin'] : null
+                'iconDay' => isset($weather['iconDay']) ? $weather['iconDay'] : '',
+                'textDay' => isset($weather['textDay']) ? $weather['textDay'] : '',
+                'tempMax' => isset($weather['tempMax']) ? $weather['tempMax'] : null,
+                'tempMin' => isset($weather['tempMin']) ? $weather['tempMin'] : null
             );
             set_transient($cache_key, $out, 2 * MINUTE_IN_SECONDS);
             return rest_ensure_response($out);
