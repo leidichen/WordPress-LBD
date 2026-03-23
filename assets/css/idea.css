@@ -487,9 +487,11 @@ html.light-theme {
     backdrop-filter: blur(2px);
 }
 .idea-lightbox-close {
-    top: 12px;
-    right: 12px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
     font-size: 20px;
+    z-index: 10001;
 }
 .idea-lightbox-prev {
     left: 12px;
@@ -504,8 +506,8 @@ html.light-theme {
     font-size: 22px;
 }
 .idea-lightbox-counter {
-    position: absolute;
-    bottom: 12px;
+    position: fixed;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     color: #fff;
@@ -514,7 +516,24 @@ html.light-theme {
     border: 1px solid rgba(255,255,255,0.25);
     border-radius: 6px;
     padding: 4px 8px;
+    z-index: 10001;
 }
 .idea-lightbox-open {
     overflow: hidden;
+}
+
+@media (max-width: 480px) {
+    .idea-lightbox-prev,
+    .idea-lightbox-next {
+        display: none !important;
+    }
+
+    .idea-lightbox-close {
+        top: 16px;
+        right: 16px;
+    }
+
+    .idea-lightbox-counter {
+        bottom: 16px;
+    }
 }

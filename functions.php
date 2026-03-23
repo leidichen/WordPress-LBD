@@ -2,7 +2,7 @@
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 // 主题设置
-define('LBD_VERSION', '1.2.8');
+define('LBD_VERSION', '1.2.9');
 
 /**
  * 自动更新设置 (基于 GitHub)
@@ -115,6 +115,14 @@ if ( ! function_exists( 'yayu_load_style' ) ) :
 			);
 		}
 		// 注册并内联一个小脚本用于主题亮/暗切换
+		if (is_page_template('podcast.php')) {
+			wp_enqueue_style(
+				'dear-podcast-style',
+				get_template_directory_uri() . '/assets/css/podcast.css',
+				array('dear-base-style'),
+				LBD_VERSION
+			);
+		}
 		wp_register_script('dear-theme-toggle', false, array(), null, true);
 		wp_enqueue_script('dear-theme-toggle');
 		$script = "(function(){var t=document.getElementById('theme-toggle');if(!t)return;var b=document.documentElement;var sunIcon=t.querySelector('.sun'),moonIcon=t.querySelector('.moon');var m=document.getElementById('theme-color-meta');function persist(theme){try{localStorage.setItem('dear-theme',theme);document.cookie='dear-theme='+theme+'; path=/; max-age=31536000; SameSite=Lax';}catch(e){}}function sync(){var isLight=b.classList.contains('light-theme');t.setAttribute('aria-pressed',isLight?'true':'false');if(sunIcon&&moonIcon){sunIcon.style.display=isLight?'none':'inline';moonIcon.style.display=isLight?'inline':'none';}if(m)m.setAttribute('content',isLight?'#ffffff':'#022430');}t.addEventListener('click',function(){var isLight=b.classList.contains('light-theme');if(isLight){b.classList.remove('light-theme');persist('dark');}else{b.classList.add('light-theme');persist('light');}sync();});sync();})();";
@@ -623,6 +631,54 @@ function get_weekly_grid_columns() {
 // 获取周刊卡片间距设置
 function get_weekly_card_spacing() {
     return get_theme_mod('weekly_card_spacing', '20');
+}
+
+// 播客（Podcast）设置面板
+function dear_podcast_customizer($wp_customize) {
+    // 播客设置面板
+    $wp_customize->add_section('dear_podcast_settings', array(
+        'title' => '播客设置',
+        'priority' => 37,
+        'description' => '设置播客模板的显示样式和参数'
+    ));
+
+    // 播客 RSS 源地址
+    $wp_customize->add_setting('podcast_rss_url', array(
+        'default' => 'https://feed.xyzfm.space/bf7xdm8hrfg6',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    $wp_customize->add_control('podcast_rss_url', array(
+        'label' => '播客 RSS 源地址',
+        'section' => 'dear_podcast_settings',
+        'type' => 'url',
+        'description' => '输入播客 RSS 源的 URL（例如小宇宙的播客源）。程序会自动解析。'
+    ));
+
+    // 播客每页显示卡片数
+    $wp_customize->add_setting('podcast_posts_per_page', array(
+        'default' => 20,
+        'sanitize_callback' => 'absint',
+    ));
+    $wp_customize->add_control('podcast_posts_per_page', array(
+        'label' => '每页播客数',
+        'section' => 'dear_podcast_settings',
+        'type' => 'number',
+        'input_attrs' => array(
+            'min' => 5,
+            'max' => 50,
+            'step' => 1,
+        ),
+        'description' => '设置播客页面每页显示的播客数量，默认 20 篇'
+    ));
+}
+add_action('customize_register', 'dear_podcast_customizer');
+
+function get_podcast_rss_url() {
+    return esc_url_raw(get_theme_mod('podcast_rss_url', 'https://feed.xyzfm.space/bf7xdm8hrfg6'));
+}
+
+function get_podcast_posts_per_page() {
+    return (int) get_theme_mod('podcast_posts_per_page', 20);
 }
 
 // 获取网格每页卡片数

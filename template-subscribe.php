@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: 订阅页面
+Template Name: 订阅模板
 */
 get_header(); ?>
 
@@ -44,6 +44,15 @@ get_header(); ?>
                 <p>生活灵感分享，随时更新。</p>
                 <div class="rss-link-box">
                     <code><?php echo esc_url(home_url('/category/' . $flash_slug . '/feed/')); ?></code>
+                </div>
+            </div>
+
+            <div class="rss-item">
+                <?php $podcast_rss_url = function_exists('get_podcast_rss_url') ? get_podcast_rss_url() : ''; ?>
+                <h3><a href="<?php echo esc_url($podcast_rss_url); ?>">播客 RSS</a></h3>
+                <p>同步播客单集更新，直接使用播客设置中的 RSS 地址。</p>
+                <div class="rss-link-box">
+                    <code><?php echo esc_html($podcast_rss_url); ?></code>
                 </div>
             </div>
         </div>

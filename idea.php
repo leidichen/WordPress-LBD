@@ -52,11 +52,19 @@ get_header(); ?>
                             $card_extra_class = $has_image ? 'has-image' : 'no-image';
                             ?>
                             <div class="idea-card-container <?php echo $card_extra_class; ?>">
+                                <?php $weather_snapshot = function_exists('lbd_get_post_weather_snapshot') ? lbd_get_post_weather_snapshot(get_the_ID()) : false; ?>
                                 <div class="idea-card-header">
                                     <span class="idea-timestamp"><?php echo get_the_time('n月j日 H:i'); ?></span>
                                     <div class="idea-meta">
-                                        <?php if (function_exists('get_weather_enabled') && get_weather_enabled() && get_the_date('Ymd') === date_i18n('Ymd')): ?>
-                                            <span class="idea-weather" aria-label="weather"></span>
+                                        <?php if (!empty($weather_snapshot['iconDay']) || $weather_snapshot && ($weather_snapshot['tempMin'] !== '' || $weather_snapshot['tempMax'] !== '')): ?>
+                                            <span class="idea-weather" aria-label="<?php echo esc_attr(trim(($weather_snapshot['textDay'] ?? '') . ' ' . (($weather_snapshot['tempMin'] ?? '') !== '' && ($weather_snapshot['tempMax'] ?? '') !== '' ? $weather_snapshot['tempMin'] . '–' . $weather_snapshot['tempMax'] . '℃' : ''))); ?>">
+                                                <?php if (!empty($weather_snapshot['iconDay'])): ?>
+                                                    <i class="qi-<?php echo esc_attr($weather_snapshot['iconDay']); ?>-fill" aria-hidden="true"></i>
+                                                <?php endif; ?>
+                                                <?php if (($weather_snapshot['tempMin'] ?? '') !== '' && ($weather_snapshot['tempMax'] ?? '') !== ''): ?>
+                                                    <span class="idea-temp"><?php echo esc_html($weather_snapshot['tempMin'] . '–' . $weather_snapshot['tempMax'] . '℃'); ?></span>
+                                                <?php endif; ?>
+                                            </span>
                                         <?php endif; ?>
                                     </div>
                                 </div>

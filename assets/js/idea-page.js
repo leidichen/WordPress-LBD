@@ -318,40 +318,5 @@
         return mdBlock(root);
       }
     })();
-    (function initWeather() {
-      var nodes = document.querySelectorAll('.idea-weather');
-      if (!nodes.length) return;
-      var today = new Date().toISOString().slice(0,10);
-      var cacheKey = 'lbd_weather_'+today;
-      try {
-        var cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          render(JSON.parse(cached));
-          return;
-        }
-      } catch (e) {}
-      fetch('/wp-json/lbd/v1/weather', { credentials: 'same-origin' })
-        .then(function (res) { return res && res.ok ? res.json() : null; })
-        .then(function (data) {
-          if (!data) return;
-          try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
-          render(data);
-        })
-        .catch(function () {});
-
-      function render(data) {
-        var icon = (data && (data.iconDay || data.icon)) || '';
-        var max = (data && (data.tempMax != null)) ? String(data.tempMax) : '';
-        var min = (data && (data.tempMin != null)) ? String(data.tempMin) : '';
-        var tempStr = (min !== '' && max !== '') ? (min + '–' + max + '℃') : '';
-        var html = '';
-        if (icon) html += '<i class="qi-' + icon + '-fill" aria-hidden="true"></i>';
-        if (tempStr) html += ' <span class="idea-temp">' + tempStr + '</span>';
-        nodes.forEach(function (el) {
-          el.innerHTML = html;
-          if (tempStr) el.setAttribute('aria-label', tempStr);
-        });
-      }
-    })();
   });
 })();
