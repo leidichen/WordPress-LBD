@@ -167,6 +167,24 @@ img {
     height: auto
 }
 
+video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+}
+
+audio {
+    max-width: 100%;
+    display: block;
+}
+
+iframe {
+    max-width: 100%;
+    border: none;
+    border-radius: 6px;
+}
+
 /* Search Page Tags */
 .search-tags {
     margin-top: 20px;

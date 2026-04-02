@@ -2,7 +2,7 @@
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 // 主题设置
-define('LBD_VERSION', '1.3.0');
+define('LBD_VERSION', '1.3.1');
 
 /**
  * 自动更新设置 (基于 GitHub)
@@ -770,7 +770,11 @@ function get_twitter_style_content($length = 300) {
         'h6' => array('class' => true, 'style' => true),
         'code' => array('class' => true, 'style' => true),
         'pre' => array('class' => true, 'style' => true),
-        'span' => array('class' => true, 'style' => true)
+        'span' => array('class' => true, 'style' => true),
+        'video' => array('src' => true, 'controls' => true, 'width' => true, 'height' => true, 'class' => true, 'style' => true, 'muted' => true, 'autoplay' => true, 'loop' => true, 'preload' => true, 'poster' => true, 'playsinline' => true),
+        'audio' => array('src' => true, 'controls' => true, 'class' => true, 'style' => true, 'muted' => true, 'autoplay' => true, 'loop' => true, 'preload' => true),
+        'source' => array('src' => true, 'type' => true),
+        'iframe' => array('src' => true, 'width' => true, 'height' => true, 'frameborder' => true, 'allowfullscreen' => true, 'scrolling' => true, 'class' => true, 'style' => true, 'allow' => true)
     );
     
     $content_filtered = wp_kses($content, $allowed_tags);
@@ -1265,4 +1269,27 @@ add_action('rest_api_init', function () {
     ));
 });
 
-?>
+
+/**
+ * 还原 Obsidian 等客户端同步由于转义造成的 <video> / <audio> / <iframe> 标签
+ */
+function restore_escaped_media_tags($content) {
+    if (empty($content)) return $content;
+    
+    $tags = array('video', 'audio', 'iframe');
+    foreach ( $tags as $tag ) {
+        // 解码开始标签，例如 &lt;video src="..." controls...&gt;
+        $pattern = '/&lt;(' . $tag . '\b.*?)&gt;/is';
+        if ( preg_match($pattern, $content) ) {
+            $content = preg_replace_callback($pattern, function($matches) {
+                // 将被转义的引号等也一并还原
+                return '<' . html_entity_decode($matches[1], ENT_QUOTES, 'UTF-8') . '>';
+            }, $content);
+            // 替换闭合标签
+            $content = str_ireplace('&lt;/' . $tag . '&gt;', '</' . $tag . '>', $content);
+        }
+    }
+    return $content;
+}
+add_filter('the_content', 'restore_escaped_media_tags', 20);
+add_filter('the_excerpt', 'restore_escaped_media_tags', 20);

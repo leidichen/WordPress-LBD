@@ -213,6 +213,25 @@ html.light-theme {
     overflow: auto;
     text-align: left;
 }
+.idea-card-content video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+    margin: 8px 0 12px;
+}
+.idea-card-content audio {
+    width: 100%;
+    display: block;
+    margin: 8px 0 12px;
+}
+.idea-card-content iframe {
+    width: 100%;
+    display: block;
+    border: none;
+    border-radius: 6px;
+    margin: 8px 0 12px;
+}
 .idea-card-content .todo-checkbox {
     display: inline-block;
     width: 1em;
@@ -536,4 +555,25 @@ html.light-theme {
     .idea-lightbox-counter {
         bottom: 16px;
     }
+}
+
+/* 视频/音频/iframe 媒体元素样式 */
+.idea-card-content video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+    margin: 8px 0 12px;
+}
+.idea-card-content audio {
+    width: 100%;
+    display: block;
+    margin: 8px 0 12px;
+}
+.idea-card-content iframe {
+    width: 100%;
+    display: block;
+    border: none;
+    border-radius: 6px;
+    margin: 8px 0 12px;
 }
