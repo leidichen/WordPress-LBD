@@ -1138,11 +1138,11 @@ function dear_weather_customizer($wp_customize) {
                     <?php endif; ?>
                     <div class="lbd-weather-verify-row" style="display:flex;align-items:center;gap:10px;">
                         <button type="button" class="button button-primary" id="lbd-weather-verify-btn">验证天气</button>
-                        <a id="lbd-weather-help-link" href="#" target="_blank" rel="noopener" aria-label="帮助" title="如何获取和风天气API与位置ID" style="display:inline-flex;align-items:center;color:inherit;text-decoration:none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <a id="lbd-weather-help-link" href="https://github.com/leidichen/WordPress-LBD/blob/main/docs/qweather-setup.md" target="_blank" rel="noopener" aria-label="帮助" title="如何获取和风天气API与位置ID" style="display:inline-flex;align-items:center;text-decoration:none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#646970" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 2-3 4"></path>
-                                <path d="M12 17h.01"></path>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
                             </svg>
                         </a>
                         <span id="lbd-weather-verify-result" style="line-height:28px;"></span>

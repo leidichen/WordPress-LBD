@@ -133,11 +133,12 @@ if (have_posts()) {
                             <div class="podcast-meta-row">
                                 <span class="podcast-badge">Podcast</span>
                                 <span class="podcast-date"><?php echo esc_html($item['date']); ?></span>
+                                <a class="podcast-episode-link" href="<?php echo esc_url($item['link']); ?>" target="_blank" rel="noopener noreferrer">
+                                    查看单集
+                                </a>
                             </div>
                             <h2 class="podcast-title">
-                                <a href="<?php echo esc_url($item['link']); ?>" target="_blank" rel="noopener noreferrer">
-                                    <?php echo esc_html($item['title']); ?>
-                                </a>
+                                <?php echo esc_html($item['title']); ?>
                             </h2>
                             
                             <?php if ($item['description']): ?>
@@ -161,11 +162,7 @@ if (have_posts()) {
                                 </div>
                             <?php endif; ?>
 
-                            <div class="podcast-actions">
-                                <a class="podcast-episode-link" href="<?php echo esc_url($item['link']); ?>" target="_blank" rel="noopener noreferrer">
-                                    查看单集
-                                </a>
-                            </div>
+
                         </div>
                     </article>
                 <?php endforeach; ?>
