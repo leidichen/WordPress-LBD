@@ -26,3 +26,8 @@ inc/plugin-update-checker/phpcs.xml
 inc/plugin-update-checker/README.md
 inc/plugin-update-checker/examples/
 inc/plugin-update-checker/build/
+
+# AI workflow and specs
+.spec-workflow/
+.antigravity/
+
