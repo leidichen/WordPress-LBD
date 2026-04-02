@@ -13,3 +13,16 @@ build/
 
 # Exclude release notes
 release-notes-*.md
+
+# Exclude local build scripts
+build.ps1
+
+# Exclude plugin-update-checker development files
+inc/plugin-update-checker/.editorconfig
+inc/plugin-update-checker/.gitattributes
+inc/plugin-update-checker/.gitignore
+inc/plugin-update-checker/composer.json
+inc/plugin-update-checker/phpcs.xml
+inc/plugin-update-checker/README.md
+inc/plugin-update-checker/examples/
+inc/plugin-update-checker/build/
