@@ -2,7 +2,7 @@
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 // 主题设置
-define('LBD_VERSION', '1.3.1');
+define('LBD_VERSION', '1.3.2');
 
 /**
  * 自动更新设置 (基于 GitHub)
@@ -1049,12 +1049,8 @@ function lbd_get_post_weather_snapshot($post_id = 0) {
     return is_array($snapshot) ? $snapshot : false;
 }
 
-function lbd_capture_weather_snapshot_on_first_publish($new_status, $old_status, $post) {
-    if (!$post instanceof WP_Post || $post->post_type !== 'post') {
-        return;
-    }
-
-    if ($new_status !== 'publish' || $old_status === 'publish') {
+function lbd_try_capture_weather_snapshot($post) {
+    if (!$post instanceof WP_Post || $post->post_type !== 'post' || $post->post_status !== 'publish') {
         return;
     }
 
@@ -1078,7 +1074,18 @@ function lbd_capture_weather_snapshot_on_first_publish($new_status, $old_status,
 
     update_post_meta($post->ID, '_lbd_weather_snapshot', $weather);
 }
+
+function lbd_capture_weather_snapshot_on_first_publish($new_status, $old_status, $post) {
+    if ($new_status === 'publish' && $old_status !== 'publish') {
+        lbd_try_capture_weather_snapshot($post);
+    }
+}
 add_action('transition_post_status', 'lbd_capture_weather_snapshot_on_first_publish', 10, 3);
+
+function lbd_capture_weather_on_rest_insert($post, $request, $creating) {
+    lbd_try_capture_weather_snapshot($post);
+}
+add_action('rest_after_insert_post', 'lbd_capture_weather_on_rest_insert', 10, 3);
 
 function lbd_get_today_weather(WP_REST_Request $req) {
     if (!get_weather_enabled()) return new WP_REST_Response(null, 204);
