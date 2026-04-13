@@ -4,6 +4,8 @@
 
 ![License](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-green) ![Version](https://img.shields.io/badge/version-1.3.2-blue)
 
+![小熊日记主题宣传片 mp4_000017 807](https://github.com/user-attachments/assets/5c0f7af7-fbd5-4ecd-a1fd-2a542d37b5ec)
+
 ## ✨ 核心特性
 
 - 🌓 **自动明暗模式**：跟随系统设置自动切换，夜晚护眼，白天清晰。
